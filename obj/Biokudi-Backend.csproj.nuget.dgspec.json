@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\gabma\\OneDrive - UNIVERSIDAD DE CUNDINAMARCA\\Semestres\\2024-2\\Ingenieria de software 2\\Biokudi-Backend\\Biokudi-Backend.csproj": {}
+    "C:\\Users\\gabma\\OneDrive - UNIVERSIDAD DE CUNDINAMARCA\\Semestres\\2024-2\\Ingenieria de software 2\\BioKudi-Backend\\Biokudi-Backend.csproj": {}
   },
   "projects": {
-    "C:\\Users\\gabma\\OneDrive - UNIVERSIDAD DE CUNDINAMARCA\\Semestres\\2024-2\\Ingenieria de software 2\\Biokudi-Backend\\Biokudi-Backend.csproj": {
+    "C:\\Users\\gabma\\OneDrive - UNIVERSIDAD DE CUNDINAMARCA\\Semestres\\2024-2\\Ingenieria de software 2\\BioKudi-Backend\\Biokudi-Backend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\gabma\\OneDrive - UNIVERSIDAD DE CUNDINAMARCA\\Semestres\\2024-2\\Ingenieria de software 2\\Biokudi-Backend\\Biokudi-Backend.csproj",
+        "projectUniqueName": "C:\\Users\\gabma\\OneDrive - UNIVERSIDAD DE CUNDINAMARCA\\Semestres\\2024-2\\Ingenieria de software 2\\BioKudi-Backend\\Biokudi-Backend.csproj",
         "projectName": "Biokudi-Backend",
-        "projectPath": "C:\\Users\\gabma\\OneDrive - UNIVERSIDAD DE CUNDINAMARCA\\Semestres\\2024-2\\Ingenieria de software 2\\Biokudi-Backend\\Biokudi-Backend.csproj",
+        "projectPath": "C:\\Users\\gabma\\OneDrive - UNIVERSIDAD DE CUNDINAMARCA\\Semestres\\2024-2\\Ingenieria de software 2\\BioKudi-Backend\\Biokudi-Backend.csproj",
         "packagesPath": "C:\\Users\\gabma\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\gabma\\OneDrive - UNIVERSIDAD DE CUNDINAMARCA\\Semestres\\2024-2\\Ingenieria de software 2\\Biokudi-Backend\\obj\\",
+        "outputPath": "C:\\Users\\gabma\\OneDrive - UNIVERSIDAD DE CUNDINAMARCA\\Semestres\\2024-2\\Ingenieria de software 2\\BioKudi-Backend\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
