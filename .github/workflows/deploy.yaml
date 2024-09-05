@@ -27,13 +27,11 @@ jobs:
         CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
 
     - name: FTP Deploy
-      uses: SamKirkland/FTP-Deploy-Action@4.3.0
+      uses: lukaszbadura/ftp-action@v1.0
       with:
-        server: ${{ secrets.FTP_SERVER }}
-        username: ${{ secrets.FTP_USERNAME }}
+        host: ${{ secrets.FTP_SERVER }}
+        user: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
-        local-dir: './output/'
-        server-dir: '/www.biokudi.somee.com/'
-        protocol: 'ftp'
-        passive: true
+        localDir: './output/'
+        remoteDir: '/www.biokudi.somee.com/'
 
