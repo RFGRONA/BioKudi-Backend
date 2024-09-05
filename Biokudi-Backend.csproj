@@ -26,7 +26,7 @@
     <Folder Include="Application\DTOs\" />
     <Folder Include="Application\Interfaces\" />
     <Folder Include="Application\Services\" />
-    <Folder Include="Domain\Entities\" />
+    <Folder Include="Controllers\" />
     <Folder Include="Domain\Interfaces\" />
     <Folder Include="Domain\Services\" />
     <Folder Include="Infrastructure\ExternalServices\" />
