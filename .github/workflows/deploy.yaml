@@ -33,5 +33,5 @@ jobs:
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         local-dir: ./output
-        server-dir: /biokudi.somee.com
+        server-dir: /biokudi.somee.com/
         protocol: ftp
