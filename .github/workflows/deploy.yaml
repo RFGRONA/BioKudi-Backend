@@ -29,8 +29,10 @@ jobs:
     - name: FTP Deploy
       uses: SamKirkland/FTP-Deploy-Action@v4.3.5
       with:
-        server: ftp://155.254.244.38/www.biokudi.somee.com
+        server: 155.254.244.38
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
+        local-dir: './output/'
+        server-dir: '/www.biokudi.somee.com/'
 
 
