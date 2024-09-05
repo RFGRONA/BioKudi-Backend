@@ -1,7 +1,20 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\Users\\gabma\\OneDrive - UNIVERSIDAD DE CUNDINAMARCA\\Semestres\\2024-2\\Ingenieria de software 2\\BioKudi-Backend\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{95EF73BB-2894-457E-8FDE-F9A36DEBB309}|Biokudi-Backend.csproj|c:\\users\\gabma\\onedrive - universidad de cundinamarca\\semestres\\2024-2\\ingenieria de software 2\\biokudi-backend\\biokudi-backend.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{95EF73BB-2894-457E-8FDE-F9A36DEBB309}|Biokudi-Backend.csproj|solutionrelative:biokudi-backend.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{95EF73BB-2894-457E-8FDE-F9A36DEBB309}|Biokudi-Backend.csproj|c:\\users\\gabma\\onedrive - universidad de cundinamarca\\semestres\\2024-2\\ingenieria de software 2\\biokudi-backend\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{95EF73BB-2894-457E-8FDE-F9A36DEBB309}|Biokudi-Backend.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{95EF73BB-2894-457E-8FDE-F9A36DEBB309}|Biokudi-Backend.csproj|c:\\users\\gabma\\onedrive - universidad de cundinamarca\\semestres\\2024-2\\ingenieria de software 2\\biokudi-backend\\infrastructure\\data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{95EF73BB-2894-457E-8FDE-F9A36DEBB309}|Biokudi-Backend.csproj|solutionrelative:infrastructure\\data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -9,11 +22,54 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": -1,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{0174dea2-fdbe-4ef1-8f99-c0beae78880f}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Biokudi-Backend",
+              "DocumentMoniker": "C:\\Users\\gabma\\OneDrive - UNIVERSIDAD DE CUNDINAMARCA\\Semestres\\2024-2\\Ingenieria de software 2\\Biokudi-Backend\\Biokudi-Backend.csproj",
+              "RelativeDocumentMoniker": "Biokudi-Backend.csproj",
+              "ToolTip": "C:\\Users\\gabma\\OneDrive - UNIVERSIDAD DE CUNDINAMARCA\\Semestres\\2024-2\\Ingenieria de software 2\\Biokudi-Backend\\Biokudi-Backend.csproj*",
+              "RelativeToolTip": "Biokudi-Backend.csproj*",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAArAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2024-09-05T02:46:12.998Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "ApplicationDbContext.cs",
+              "DocumentMoniker": "C:\\Users\\gabma\\OneDrive - UNIVERSIDAD DE CUNDINAMARCA\\Semestres\\2024-2\\Ingenieria de software 2\\BioKudi-Backend\\Infrastructure\\Data\\ApplicationDbContext.cs",
+              "RelativeDocumentMoniker": "Infrastructure\\Data\\ApplicationDbContext.cs",
+              "ToolTip": "C:\\Users\\gabma\\OneDrive - UNIVERSIDAD DE CUNDINAMARCA\\Semestres\\2024-2\\Ingenieria de software 2\\BioKudi-Backend\\Infrastructure\\Data\\ApplicationDbContext.cs",
+              "RelativeToolTip": "Infrastructure\\Data\\ApplicationDbContext.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-09-05T02:41:49.085Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\gabma\\OneDrive - UNIVERSIDAD DE CUNDINAMARCA\\Semestres\\2024-2\\Ingenieria de software 2\\BioKudi-Backend\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "C:\\Users\\gabma\\OneDrive - UNIVERSIDAD DE CUNDINAMARCA\\Semestres\\2024-2\\Ingenieria de software 2\\BioKudi-Backend\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAAA4AAAAAAAAAAADwvxgAAAAaAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-09-05T02:08:02.355Z",
+              "EditorCaption": ""
             }
           ]
         }
