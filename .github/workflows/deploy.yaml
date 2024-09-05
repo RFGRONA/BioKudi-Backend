@@ -33,6 +33,7 @@ jobs:
         ftp_username: ${{ secrets.FTP_USERNAME }}
         ftp_password: ${{ secrets.FTP_PASSWORD }}
         local_source_dir: "./output/"
-        dist_target_dir: "/"
-        delete: "false"
+        dist_target_dir: "/www.biokudi.somee.com/"
+        delete: "true"
         passive: "true"
+
