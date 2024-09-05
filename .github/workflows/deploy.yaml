@@ -26,12 +26,12 @@ jobs:
       env:
         CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
 
-    - name: Deploy to FTP Server
-      uses: SamKirkland/FTP-Deploy-Action@4.3.3
+    - name: FTP deploy
+      uses: kevinpainchaud/simple-ftp-deploy-action@v1.2.1
       with:
-        server: ftp://${{ secrets.FTP_SERVER }}
-        username: ${{ secrets.FTP_USERNAME }}
-        password: ${{ secrets.FTP_PASSWORD }}
-        local-dir: ./output/
-        server-dir: /
-        protocol: ftp
+        ftp_host: ${{ secrets.FTP_SERVER }}
+        ftp_username: ${{ secrets.FTP_USERNAME }}
+        ftp_password: ${{ secrets.FTP_PASSWORD }}
+        local_source_dir: "./output/"
+        dist_target_dir: "/"
+        delete: "false"
