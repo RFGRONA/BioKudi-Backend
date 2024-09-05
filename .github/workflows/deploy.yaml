@@ -1,4 +1,4 @@
-name: Deploy to Somee FTP Server
+name: Deploy to FTP Server
 
 on:
   push:
@@ -26,15 +26,7 @@ jobs:
       env:
         CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
 
-    - name: Debug - List output directory
-      run: |
-        ls -R ./output
-
-    - name: Debug - Ping FTP server
-      run: |
-        ping -c 4 ${{ secrets.FTP_SERVER }}
-
-    - name: Deploy to Somee FTP Server
+    - name: Deploy to FTP Server
       uses: SamKirkland/FTP-Deploy-Action@4.3.3
       with:
         server: ftp://${{ secrets.FTP_SERVER }}
@@ -43,11 +35,3 @@ jobs:
         local-dir: ./output/
         server-dir: /
         protocol: ftp
-
-    - name: Debug FTP connection
-      if: always()
-      run: |
-        echo "FTP Server: ftp://${{ secrets.FTP_SERVER }}"
-        echo "Username: ${{ secrets.FTP_USERNAME }}"
-        echo "Local Directory: ./output/"
-        echo "Server Directory: /"
