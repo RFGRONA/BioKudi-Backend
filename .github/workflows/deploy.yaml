@@ -35,3 +35,4 @@ jobs:
         local_source_dir: "./output/"
         dist_target_dir: "/"
         delete: "false"
+        passive: "true"
