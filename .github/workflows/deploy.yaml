@@ -26,14 +26,14 @@ jobs:
       env:
         CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
 
-    - name: FTP deploy
-      uses: kevinpainchaud/simple-ftp-deploy-action@v1.2.1
+    - name: FTP Deploy
+      uses: SamKirkland/FTP-Deploy-Action@4.3.0
       with:
-        ftp_host: ${{ secrets.FTP_SERVER }}
-        ftp_username: ${{ secrets.FTP_USERNAME }}
-        ftp_password: ${{ secrets.FTP_PASSWORD }}
-        local_source_dir: "./output/"
-        dist_target_dir: "/www.biokudi.somee.com/"
-        delete: "true"
-        passive: "true"
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        local-dir: './output/'
+        server-dir: '/www.biokudi.somee.com/'
+        protocol: 'ftp'
+        passive: true
 
