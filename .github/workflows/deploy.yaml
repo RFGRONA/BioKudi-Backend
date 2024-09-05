@@ -26,18 +26,28 @@ jobs:
       env:
         CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
 
-    - name: Debug FTP connection
-      if: failure()
+    - name: Debug - List output directory
       run: |
-        echo "FTP Server: ${{ secrets.FTP_SERVER }}"
-        echo "Username: ${{ secrets.FTP_USERNAME }}"
+        ls -R ./output
 
-    - name: Deploy to FTP Server
+    - name: Debug - Ping FTP server
+      run: |
+        ping -c 4 $(echo ${{ secrets.FTP_SERVER }} | sed 's|ftp://||')
+
+    - name: Deploy to Somee FTP Server
       uses: SamKirkland/FTP-Deploy-Action@4.3.3
       with:
         server: ${{ secrets.FTP_SERVER }}
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         local-dir: ./output/
-        server-dir: /biokudi.somee.com/
+        server-dir: /
         protocol: ftp
+
+    - name: Debug FTP connection
+      if: always()
+      run: |
+        echo "FTP Server: ${{ secrets.FTP_SERVER }}"
+        echo "Username: ${{ secrets.FTP_USERNAME }}"
+        echo "Local Directory: ./output/"
+        echo "Server Directory: /"
