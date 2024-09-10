@@ -1,0 +1,7 @@
+
+appsettings.Development.json
+/.vs
+/bin
+/obj
+appsettings.Development.json
+Biokudi-Backend.csproj.user
