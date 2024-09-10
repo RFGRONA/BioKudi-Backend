@@ -4,5 +4,6 @@
     {
         public int IdDepartment { get; set; }
         public string NameDepartment { get; set; }
+        public ICollection<CatCityEntity> Cities { get; set; }
     }
 }

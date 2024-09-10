@@ -1,4 +1,5 @@
 ﻿using Biokudi_Backend.Infrastructure;
+using System.Diagnostics;
 
 namespace Biokudi_Backend.Domain.Entities
 {
@@ -17,5 +18,7 @@ namespace Biokudi_Backend.Domain.Entities
         public CatCity City { get; set; }
         public int StateId { get; set; }
         public CatState State { get; set; }
+        public ICollection<CatActivityEntity> Activities { get; set; }  
+        public ICollection<ReviewEntity> Reviews { get; set; }
     }
 }

@@ -11,5 +11,6 @@ namespace Biokudi_Backend.Domain.Entities
         public string Text { get; set; }
         public int? PlaceId { get; set; }
         public Place Place { get; set; }
+        public ICollection<CatTagEntity> Tags { get; set; }
     }
 }

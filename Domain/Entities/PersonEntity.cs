@@ -20,5 +20,7 @@ namespace Biokudi_Backend.Domain.Entities
         public bool EmailNotification { get; set; } = true;
         public bool EmailPost { get; set; } = true;
         public bool EmailList { get; set; } = true;
+        public ICollection<TicketEntity> Tickets { get; set; }
+        public ICollection<ReviewEntity> Reviews { get; set; }
     }
 }
