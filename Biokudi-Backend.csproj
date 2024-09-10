@@ -25,12 +25,12 @@
   <ItemGroup>
     <Folder Include="Application\DTOs\" />
     <Folder Include="Application\Interfaces\" />
+    <Folder Include="Application\Mappings\" />
     <Folder Include="Application\Services\" />
-    <Folder Include="Controllers\" />
-    <Folder Include="Domain\Interfaces\" />
     <Folder Include="Domain\Services\" />
     <Folder Include="Infrastructure\ExternalServices\" />
     <Folder Include="Infrastructure\Repositories\" />
+    <Folder Include="UI\Controllers\" />
   </ItemGroup>
 
 </Project>
