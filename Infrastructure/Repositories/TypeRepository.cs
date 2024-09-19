@@ -5,32 +5,32 @@ namespace Biokudi_Backend.Infrastructure.Repositories
 {
     public class TypeRepository : ITypeRepository
     {
-        public Task Create(CatTypeEntity entity)
+        public Task<CatTypeEntity>? Create(CatTypeEntity entity)
         {
             throw new NotImplementedException();
         }
 
-        public void Delete(CatTypeEntity entity)
+        public Task<bool> Delete(CatTypeEntity entity)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<CatTypeEntity>> GetAll()
+        public Task<IEnumerable<CatTypeEntity>?> GetAll()
         {
             throw new NotImplementedException();
         }
 
-        public Task<CatTypeEntity> GetById(int id)
+        public Task<CatTypeEntity>? GetById(int id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<CatTypeEntity>> GetTypesByTableRelationAsync(string tableRelation)
+        public Task<IEnumerable<CatTypeEntity>?> GetTypesByTableRelationAsync(string tableRelation)
         {
             throw new NotImplementedException();
         }
 
-        public void Update(CatTypeEntity entity)
+        public Task<bool> Update(CatTypeEntity entity)
         {
             throw new NotImplementedException();
         }

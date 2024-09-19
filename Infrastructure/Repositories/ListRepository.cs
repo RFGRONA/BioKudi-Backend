@@ -5,27 +5,27 @@ namespace Biokudi_Backend.Infrastructure.Repositories
 {
     public class ListRepository : IListRepository
     {
-        public Task Create(ListEntity entity)
+        public Task<ListEntity>? Create(ListEntity entity)
         {
             throw new NotImplementedException();
         }
 
-        public void Delete(ListEntity entity)
+        public Task<bool> Delete(ListEntity entity)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<ListEntity>> GetAll()
+        public Task<IEnumerable<ListEntity>?> GetAll()
         {
             throw new NotImplementedException();
         }
 
-        public Task<ListEntity> GetById(int id)
+        public Task<ListEntity>? GetById(int id)
         {
             throw new NotImplementedException();
         }
 
-        public void Update(ListEntity entity)
+        public Task<bool> Update(ListEntity entity)
         {
             throw new NotImplementedException();
         }

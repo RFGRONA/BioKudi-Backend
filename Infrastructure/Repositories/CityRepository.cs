@@ -5,32 +5,32 @@ namespace Biokudi_Backend.Infrastructure.Repositories
 {
     public class CityRepository : ICityRepository
     {
-        public Task Create(CatCityEntity entity)
+        public Task<CatCityEntity>? Create(CatCityEntity entity)
         {
             throw new NotImplementedException();
         }
 
-        public void Delete(CatCityEntity entity)
+        public Task<bool> Delete(CatCityEntity entity)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<CatCityEntity>> GetAll()
+        public Task<IEnumerable<CatCityEntity>?> GetAll()
         {
             throw new NotImplementedException();
         }
 
-        public Task<CatCityEntity> GetById(int id)
+        public Task<CatCityEntity>? GetById(int id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<CatCityEntity>> GetCitiesByDepartmentIdAsync(int departmentId)
+        public Task<IEnumerable<CatCityEntity>?> GetCitiesByDepartmentIdAsync(int departmentId)
         {
             throw new NotImplementedException();
         }
 
-        public void Update(CatCityEntity entity)
+        public Task<bool> Update(CatCityEntity entity)
         {
             throw new NotImplementedException();
         }

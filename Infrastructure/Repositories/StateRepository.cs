@@ -5,32 +5,32 @@ namespace Biokudi_Backend.Infrastructure.Repositories
 {
     public class StateRepository : IStateRepository
     {
-        public Task Create(CatStateEntity entity)
+        public Task<CatStateEntity>? Create(CatStateEntity entity)
         {
             throw new NotImplementedException();
         }
 
-        public void Delete(CatStateEntity entity)
+        public Task<bool> Delete(CatStateEntity entity)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<CatStateEntity>> GetAll()
+        public Task<IEnumerable<CatStateEntity>?> GetAll()
         {
             throw new NotImplementedException();
         }
 
-        public Task<CatStateEntity> GetById(int id)
+        public Task<CatStateEntity>? GetById(int id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<CatStateEntity>> GetStatesByTableRelation(string tableRelation)
+        public Task<IEnumerable<CatStateEntity>?> GetStatesByTableRelation(string tableRelation)
         {
             throw new NotImplementedException();
         }
 
-        public void Update(CatStateEntity entity)
+        public Task<bool> Update(CatStateEntity entity)
         {
             throw new NotImplementedException();
         }

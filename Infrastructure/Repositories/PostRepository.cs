@@ -5,32 +5,32 @@ namespace Biokudi_Backend.Infrastructure.Repositories
 {
     public class PostRepository : IPostRepository
     {
-        public Task Create(PostEntity entity)
+        public Task<PostEntity>? Create(PostEntity entity)
         {
             throw new NotImplementedException();
         }
 
-        public void Delete(PostEntity entity)
+        public Task<bool> Delete(PostEntity entity)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<PostEntity>> GetAll()
+        public Task<IEnumerable<PostEntity>?> GetAll()
         {
             throw new NotImplementedException();
         }
 
-        public Task<PostEntity> GetById(int id)
+        public Task<PostEntity>? GetById(int id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<PostEntity>> GetPostsByPlaceIdAsync(int placeId)
+        public Task<IEnumerable<PostEntity>?> GetPostsByPlaceIdAsync(int placeId)
         {
             throw new NotImplementedException();
         }
 
-        public void Update(PostEntity entity)
+        public Task<bool> Update(PostEntity entity)
         {
             throw new NotImplementedException();
         }
