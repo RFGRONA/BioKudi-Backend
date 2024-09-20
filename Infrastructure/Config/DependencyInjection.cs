@@ -3,6 +3,7 @@ using Biokudi_Backend.Application.Mappings;
 using Biokudi_Backend.Application.Services;
 using Biokudi_Backend.Domain.Interfaces;
 using Biokudi_Backend.Infrastructure.Repositories;
+using Biokudi_Backend.Infrastructure.Services;
 
 namespace Biokudi_Backend.Infrastructure.Config
 {
@@ -10,18 +11,21 @@ namespace Biokudi_Backend.Infrastructure.Config
     {
         public static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
-            // Applitación layer (AddScoped)
+            // Application layer (AddScoped)
             services.AddScoped<PlaceMapping>();
             services.AddScoped<IPersonService, PersonService>();
             services.AddScoped<IPlaceService, PlaceService>();
-            services.AddScoped<ICacheService, CacheService>();
 
             // Infrastructure layer (AddScoped)
+            services.AddScoped<CaptchaService>();
+            services.AddScoped<CookiesService>();
+            services.AddScoped<AuthService>();
+            services.AddScoped<ICacheService, CacheService>();
             services.AddScoped<IPersonRepository, PersonRepository>();
             services.AddScoped<IPlaceRepository, PlaceRepository>();
 
             // Ui layer (Transient)
-            
+
         }
     }
 }
