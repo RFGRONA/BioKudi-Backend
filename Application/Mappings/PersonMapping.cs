@@ -20,7 +20,9 @@ namespace Biokudi_Backend.Application.Mappings
             return new LoginResponseDto
             {
                 Email = personEntity.Email,
-                NameUser = personEntity.NameUser
+                NameUser = personEntity.NameUser,
+                UserId = personEntity.IdUser,
+                Role = personEntity.Role.NameRole
             };
         }
 
