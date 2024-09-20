@@ -15,7 +15,10 @@ DependencyInjection.ConfigureServices(builder.Services, builder.Configuration);
 LoggingConfig.ConfigureServices(builder.Services, builder.Configuration);
 builder.Host.UseSerilog();
 builder.Services.AddMemoryCache();
+builder.Services.AddCustomCors();
+builder.Services.AddJwtAuthentication(builder.Configuration);
 
+builder.Services.AddHttpClient();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -30,6 +33,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors("AllAllowed");
 app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
 app.UseAuthentication();
