@@ -5,6 +5,7 @@ namespace Biokudi_Backend.Domain.Interfaces
     public interface IPersonRepository : IRepository<PersonEntity>
     {
         Task<IEnumerable<PersonEntity>?> GetAccountsDeleted();
+        Task<PersonEntity?> GetAccountByEmail(string email);
         Task<IEnumerable<PersonEntity>?> GetAccountsByRole(int role);
         Task<IEnumerable<PersonEntity>?> GetAccountsByState(int role);
     }

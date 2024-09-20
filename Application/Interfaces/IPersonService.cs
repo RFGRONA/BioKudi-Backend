@@ -5,7 +5,8 @@ namespace Biokudi_Backend.Application.Interfaces
 {
     public interface IPersonService
     {
-        Task<LoginResponseDto> LoginPerson(LoginRequestDto loginDto);
-        Task<RegisterRequestDto> RegisterPerson(RegisterRequestDto registerDto);
+        Task<LoginResponseDto>? LoginPerson(LoginRequestDto loginDto);
+        Task<RegisterRequestDto>? RegisterPerson(RegisterRequestDto registerDto);
+        Task<LoginResponseDto>? GetPersonById(int id);
     }
 }
