@@ -5,16 +5,21 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Biokudi_Backend.Infrastructure.Repositories
 {
-    public class PersonRepository(ApplicationDbContext context) : IPersonRepository
+    public class PersonRepository : IPersonRepository
     {
-        private readonly ApplicationDbContext _context = context;
+        private readonly ApplicationDbContext _context;
+        public PersonRepository(ApplicationDbContext context)
+        {
+            _context = context;
+        }
 
         public async Task<PersonEntity>? Create(PersonEntity user)
         {
             try
             {
-                if (_context.People.Any(u => u.Email == user.Email && u.AccountDeleted == false))
-                    throw new KeyNotFoundException($"El correo ya se encuentra registrado");
+                var result = _context.People.Where(u => u.Email == user.Email).FirstOrDefault();
+                if (result != null)
+                    throw new InvalidOperationException("El correo ya se encuentra registrado");
                 var person = new Person
                 {
                     NameUser = user.NameUser,
@@ -31,7 +36,7 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                     DateModified = PersonEntity.DateNowColombia()
                 };
                 _context.People.Add(person);
-                await _context.SaveChangesAsync();
+                _context.SaveChanges();
                 user.IdUser = person.IdUser;
                 return user;
             }
