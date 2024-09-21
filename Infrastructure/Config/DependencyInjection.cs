@@ -1,6 +1,7 @@
 ﻿using Biokudi_Backend.Application.Interfaces;
 using Biokudi_Backend.Application.Mappings;
 using Biokudi_Backend.Application.Services;
+using Biokudi_Backend.Application.Utilities;
 using Biokudi_Backend.Domain.Interfaces;
 using Biokudi_Backend.Infrastructure.Repositories;
 using Biokudi_Backend.Infrastructure.Services;
@@ -13,6 +14,8 @@ namespace Biokudi_Backend.Infrastructure.Config
         {
             // Application layer (AddScoped)
             services.AddScoped<PlaceMapping>();
+            services.AddScoped<EmailUtility>();
+            services.AddSingleton<RSAUtility>();
             services.AddScoped<IPersonService, PersonService>();
             services.AddScoped<IPlaceService, PlaceService>();
 
