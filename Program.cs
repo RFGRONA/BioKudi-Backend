@@ -6,10 +6,8 @@ using Serilog;
 var builder = WebApplication.CreateBuilder(args);
 
 // Connection Database
-var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING") ?? builder.Configuration.GetConnectionString("ConnectionString");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(connectionString),
-    ServiceLifetime.Scoped);
+    options.UseNpgsql(builder.Configuration.GetConnectionString("ConnectionString")));
 
 DependencyInjection.ConfigureServices(builder.Services, builder.Configuration);
 LoggingConfig.ConfigureServices(builder.Services, builder.Configuration);

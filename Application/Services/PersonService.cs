@@ -7,14 +7,11 @@ using Biokudi_Backend.Domain.Interfaces;
 
 namespace Biokudi_Backend.Application.Services
 {
-    public class PersonService : IPersonService
+    public class PersonService(IPersonRepository personRepository, EmailUtility emailUtility, RSAUtility _rsaUtility) : IPersonService
     {
-        private readonly IPersonRepository _personRepository;
-
-        public PersonService(IPersonRepository personRepository)
-        {
-            _personRepository = personRepository;
-        }
+        private readonly IPersonRepository _personRepository = personRepository;
+        private readonly EmailUtility _emailUtility = emailUtility;
+        private readonly RSAUtility _rsaUtility = _rsaUtility;
 
         public async Task<LoginResponseDto>? GetPersonById(int id)
         {
@@ -35,6 +32,7 @@ namespace Biokudi_Backend.Application.Services
             {
                 var personEntity = PersonMapping.LoginToPersonEntity(loginDto);
                 var result = await _personRepository.GetAccountByEmail(personEntity.Email);
+                result.Password = _rsaUtility.DecryptWithPrivateKey(result.Password);
                 if (!PasswordUtility.VerifyPassword(loginDto.Password, result.Password))
                     throw new KeyNotFoundException($"Contraseña incorrecta");
                 return PersonMapping.PersonEntityToLoginDto(result);
@@ -50,8 +48,10 @@ namespace Biokudi_Backend.Application.Services
             try
             {
                 var personEntity = PersonMapping.RegisterToPersonEntity(registerDto);
+                personEntity.Password = _rsaUtility.DecryptWithPrivateKey(personEntity.Password);
                 personEntity.Password = PasswordUtility.HashPassword(registerDto.Password);
                 var result = await _personRepository.Create(personEntity);
+                _emailUtility.SendEmail(result.Email, "Registro exitoso", _emailUtility.CreateAccountAlert(result.NameUser));
                 return registerDto;
             }
             catch (Exception ex)

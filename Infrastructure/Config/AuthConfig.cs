@@ -23,8 +23,8 @@ namespace Biokudi_Backend.Infrastructure.Config
                 {
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
+                    ValidateIssuer = false, //configuration["Jwt:Issuer"]
+                    ValidateAudience = false, //configuration["Jwt:Audience"]
                     ClockSkew = TimeSpan.Zero
                 };
                 options.Events = new JwtBearerEvents
