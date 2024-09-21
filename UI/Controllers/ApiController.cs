@@ -1,5 +1,6 @@
 ﻿using Biokudi_Backend.Application.DTOs.Request;
 using Biokudi_Backend.Application.Interfaces;
+using Biokudi_Backend.Application.Utilities;
 using Biokudi_Backend.Infrastructure.Services;
 using Biokudi_Backend.UI.Helpers;
 using Microsoft.AspNetCore.Authorization;
@@ -9,14 +10,16 @@ namespace Biokudi_Backend.UI.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class PersonController
-            (IPersonService _personService, CaptchaService _captchaService, AuthService _authService, CookiesService _cookieService)
+    public class ApiController
+            (IPersonService _personService, CaptchaService _captchaService, AuthService _authService, 
+        CookiesService _cookieService, RSAUtility _rsaUtility)
             : ControllerBase
     {
         private readonly IPersonService _personService = _personService;
         private readonly CaptchaService _captchaService = _captchaService;
         private readonly AuthService _authService = _authService;
         private readonly CookiesService _cookieService = _cookieService;
+        private readonly RSAUtility _rsaUtility = _rsaUtility;
 
         [HttpPost]
         [Route("register")]
@@ -84,6 +87,12 @@ namespace Biokudi_Backend.UI.Controllers
         {
             _cookieService.RemoveCookies(HttpContext);
             return Ok(PersonMessages.Logout);
+        }
+
+        [HttpGet("public-key")]
+        public ActionResult<string> GetPublicKey()
+        {
+            return Ok(_rsaUtility.GetPublicKey());
         }
     }
 }
