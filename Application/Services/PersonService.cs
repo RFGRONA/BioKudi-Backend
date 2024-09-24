@@ -32,7 +32,7 @@ namespace Biokudi_Backend.Application.Services
             {
                 var personEntity = PersonMapping.LoginToPersonEntity(loginDto);
                 var result = await _personRepository.GetAccountByEmail(personEntity.Email);
-                result.Password = _rsaUtility.DecryptWithPrivateKey(result.Password);
+                loginDto.Password = _rsaUtility.DecryptWithPrivateKey(loginDto.Password);
                 if (!PasswordUtility.VerifyPassword(loginDto.Password, result.Password))
                     throw new KeyNotFoundException($"Contraseña incorrecta");
                 return PersonMapping.PersonEntityToLoginDto(result);
