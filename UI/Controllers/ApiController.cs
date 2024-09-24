@@ -12,7 +12,7 @@ namespace Biokudi_Backend.UI.Controllers
     [Route("[controller]")]
     public class ApiController
             (IPersonService _personService, CaptchaService _captchaService, AuthService _authService, 
-        CookiesService _cookieService, RSAUtility _rsaUtility)
+        CookiesService _cookieService, RSAUtility _rsaUtility, IWebHostEnvironment _env)
             : ControllerBase
     {
         private readonly IPersonService _personService = _personService;
@@ -20,6 +20,7 @@ namespace Biokudi_Backend.UI.Controllers
         private readonly AuthService _authService = _authService;
         private readonly CookiesService _cookieService = _cookieService;
         private readonly RSAUtility _rsaUtility = _rsaUtility;
+        private readonly IWebHostEnvironment _env = _env;
 
         [HttpPost]
         [Route("register")]
@@ -28,9 +29,9 @@ namespace Biokudi_Backend.UI.Controllers
             try
             {
                 if (!ModelState.IsValid)
-                    return BadRequest(PersonMessages.InvalidModel);
-                //if (!await _captchaService.VerifyCaptcha(request.CaptchaToken))
-                //    return BadRequest(PersonMessages.CaptchaInvalid);
+                    return BadRequest(ApiMessages.InvalidModel);
+                if (!_env.IsDevelopment() && !await _captchaService.VerifyCaptcha(request.CaptchaToken))
+                    return BadRequest(ApiMessages.CaptchaInvalid);
                 var result = _personService.RegisterPerson(request);
                 return NoContent();
             }
@@ -47,9 +48,9 @@ namespace Biokudi_Backend.UI.Controllers
             try
             {
                 if (!ModelState.IsValid)
-                    return BadRequest(PersonMessages.InvalidModel);
-                //if (!await _captchaService.VerifyCaptcha(request.CaptchaToken))
-                //    return BadRequest(PersonMessages.CaptchaInvalid);
+                    return BadRequest(ApiMessages.InvalidModel);
+                if (!_env.IsDevelopment() && !await _captchaService.VerifyCaptcha(request.CaptchaToken))
+                    return BadRequest(ApiMessages.CaptchaInvalid);
                 var result = await _personService.LoginPerson(request);
                 var token = _authService.GenerateJwtToken(result.UserId.ToString(), request.RememberMe);
                 _cookieService.SetAuthCookies(HttpContext, token, result.UserId.ToString(), request.RememberMe);
@@ -57,7 +58,7 @@ namespace Biokudi_Backend.UI.Controllers
             }
             catch (Exception ex)
             {
-                return NotFound(ex.Message);
+                return Unauthorized(ex.Message);
             }
         }
 
@@ -68,12 +69,12 @@ namespace Biokudi_Backend.UI.Controllers
             try
             {
                 if (!User.Identity.IsAuthenticated)
-                    return Unauthorized(PersonMessages.InvalidSession);
+                    return Unauthorized(ApiMessages.InvalidSession);
                 var userIdCookie = Request.Cookies["userId"];
                 if (!int.TryParse(userIdCookie, out int userId))
-                    return BadRequest(PersonMessages.InvalidSession);
+                    return BadRequest(ApiMessages.InvalidSession);
                 var result = await _personService.GetPersonById(userId);
-                if (result == null) return NotFound(PersonMessages.PersonNotFound);
+                if (result == null) return NotFound(ApiMessages.PersonNotFound);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -86,13 +87,21 @@ namespace Biokudi_Backend.UI.Controllers
         public IActionResult Logout()
         {
             _cookieService.RemoveCookies(HttpContext);
-            return Ok(PersonMessages.Logout);
+            return Ok(ApiMessages.Logout);
         }
 
         [HttpGet("public-key")]
-        public ActionResult<string> GetPublicKey()
+        public ActionResult GetPublicKey()
         {
-            return Ok(_rsaUtility.GetPublicKey());
+            try
+            {
+                string publicKey = _rsaUtility.GetPublicKey();
+                return Content(publicKey, "text/plain");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ApiMessages.PublicKeyError);
+            }
         }
     }
 }
