@@ -18,7 +18,7 @@ namespace Biokudi_Backend.Infrastructure.Services
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, userId) }),
-                Expires = rememberMe ? DateTime.UtcNow.AddMonths(2) : DateTime.UtcNow.AddHours(4),
+                Expires = rememberMe ? DateTime.UtcNow.AddMonths(2) : DateTime.UtcNow.AddHours(6),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
 

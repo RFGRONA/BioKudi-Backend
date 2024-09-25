@@ -8,8 +8,9 @@
             {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = rememberMe ? DateTime.UtcNow.AddMonths(2) : (DateTime?)null 
+                SameSite = SameSiteMode.None,
+                Expires = rememberMe ? DateTime.UtcNow.AddMonths(2) : (DateTime?)null,
+                IsEssential = true
             };
             context.Response.Cookies.Append("jwt", token, cookieOptions);
 
@@ -17,8 +18,9 @@
             {
                 HttpOnly = true, 
                 Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = rememberMe ? DateTime.UtcNow.AddMonths(2) : (DateTime?)null
+                SameSite = SameSiteMode.None,
+                Expires = rememberMe ? DateTime.UtcNow.AddMonths(2) : (DateTime?)null,
+                IsEssential = true
             };
             context.Response.Cookies.Append("userId", userId, userIdOptions);
         }

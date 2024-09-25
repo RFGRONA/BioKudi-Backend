@@ -6,12 +6,21 @@
         {
             services.AddCors(options =>
             {
-                options.AddPolicy("AllAllowed", policy =>
+                options.AddPolicy("AllAllowed", builder =>
                 {
-                    policy.AllowAnyOrigin()
-                          .AllowAnyMethod()
-                          .AllowAnyHeader();
-                });
+                    var allowedOrigins = new[]
+                    {
+                        "http://localhost:3000",
+                        "https://fredybk.vercel.app",
+                        "https://biokudi.vercel.app",
+                        "https://biokudi.site"
+                    };
+
+                    builder.WithOrigins(allowedOrigins) 
+                           .AllowAnyHeader()
+                           .AllowAnyMethod()
+                           .AllowCredentials();
+            });
 
                 options.AddPolicy("OnlyFrontend", policy =>
                 {

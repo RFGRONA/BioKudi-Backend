@@ -25,7 +25,7 @@ namespace Biokudi_Backend.Infrastructure.Config
                     IssuerSigningKey = new SymmetricSecurityKey(key),
                     ValidateIssuer = false, //configuration["Jwt:Issuer"]
                     ValidateAudience = false, //configuration["Jwt:Audience"]
-                    ClockSkew = TimeSpan.Zero
+                    ClockSkew = TimeSpan.FromMinutes(5)
                 };
                 options.Events = new JwtBearerEvents
                 {
