@@ -4,6 +4,6 @@ namespace Biokudi_Backend.Domain.Interfaces
 {
     public interface ITypeRepository : IRepository<CatTypeEntity>
     {
-        Task<IEnumerable<CatTypeEntity>> GetTypesByTableRelationAsync(string tableRelation);
+        Task<IEnumerable<CatTypeEntity>?> GetTypesByTableRelationAsync(string tableRelation);
     }
 }

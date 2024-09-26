@@ -4,4 +4,7 @@ appsettings.Development.json
 /bin
 /obj
 appsettings.Development.json
+appsettings.json
 Biokudi-Backend.csproj.user
+/Logs
+Properties/PublishProfiles/FTPProfile.pubxml.user

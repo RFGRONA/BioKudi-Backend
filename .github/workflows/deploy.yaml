@@ -18,21 +18,48 @@ jobs:
       with:
         dotnet-version: '8.x' 
 
-    - name: Restore dependencies
-      run: dotnet restore
-
-    - name: Build the project
-      run: dotnet publish -c Release -o ./output
-      env:
-        CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
+    - name: Create appsettings.json
+      run: |
+        echo '{
+          "Logging": {
+            "LogLevel": {
+              "Default": "Information",
+              "Microsoft.AspNetCore": "Warning"
+            }
+          },
+          "AllowedHosts": "*",
+          "ConnectionStrings": {
+            "ConnectionString": "${{ secrets.CONNECTION_STRING }}",
+          },
+          "ApiKeys": {
+            "CaptchaKey": "${{ secrets.CAPTCHA_KEY }}",
+          },
+          "Jwt": {
+            "Key": "${{ secrets.JWT_KEY }}",
+            "Issuer": "${{ secrets.JWT_ISSUER }}",
+            "Audience": "${{ secrets.JWT_AUDIENCE }}"
+          },
+          "Smtp": {
+            "Host": "${{ secrets.SMTP_HOST }}",
+            "Port": "${{ secrets.SMTP_PORT }}",
+            "User": "${{ secrets.SMTP_USER }}",
+            "Password": "${{ secrets.SMTP_PASSWORD }}"
+          }
+        }' > appsettings.json
+    
+    - name: Build and publish
+      run: |
+        dotnet restore
+        dotnet build --configuration Release
+        dotnet publish -c Release -o ./publish
 
     - name: FTP Deploy
       uses: SamKirkland/FTP-Deploy-Action@v4.3.5
       with:
-        server: 155.254.244.38
+        server: ${{ secrets.FTP_SERVER }}
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         local-dir: './output/'
-        server-dir: '/www.biokudi.somee.com/'
+        server-dir: '${{ secrets.FTP_SERVERDIR }}'
 
 
