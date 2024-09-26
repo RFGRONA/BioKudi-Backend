@@ -10,7 +10,7 @@ namespace Biokudi_Backend.UI.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class ApiController
+    public class AuthController
             (IPersonService _personService, CaptchaService _captchaService, AuthService _authService, 
         CookiesService _cookieService, RSAUtility _rsaUtility, IWebHostEnvironment _env)
             : ControllerBase
@@ -29,9 +29,9 @@ namespace Biokudi_Backend.UI.Controllers
             try
             {
                 if (!ModelState.IsValid)
-                    return BadRequest(ApiMessages.InvalidModel);
+                    return BadRequest(AuthMessages.InvalidModel);
                 if (!_env.IsDevelopment() && !await _captchaService.VerifyCaptcha(request.CaptchaToken))
-                    return BadRequest(ApiMessages.CaptchaInvalid);
+                    return BadRequest(AuthMessages.CaptchaInvalid);
                 var result = _personService.RegisterPerson(request);
                 return NoContent();
             }
@@ -48,12 +48,12 @@ namespace Biokudi_Backend.UI.Controllers
             try
             {
                 if (!ModelState.IsValid)
-                    return BadRequest(ApiMessages.InvalidModel);
+                    return BadRequest(AuthMessages.InvalidModel);
                 if (!_env.IsDevelopment() && !await _captchaService.VerifyCaptcha(request.CaptchaToken))
-                    return BadRequest(ApiMessages.CaptchaInvalid);
+                    return BadRequest(AuthMessages.CaptchaInvalid);
                 var result = await _personService.LoginPerson(request);
                 var token = _authService.GenerateJwtToken(result.UserId.ToString(), request.RememberMe);
-                _cookieService.SetAuthCookies(HttpContext, token, result.UserId.ToString(), request.RememberMe);
+                _cookieService.SetAuthCookies(HttpContext, token, request.RememberMe);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -69,12 +69,13 @@ namespace Biokudi_Backend.UI.Controllers
             try
             {
                 if (!User.Identity.IsAuthenticated)
-                    return Unauthorized(ApiMessages.InvalidSession);
-                var userIdCookie = Request.Cookies["userId"];
-                if (!int.TryParse(userIdCookie, out int userId))
-                    return BadRequest(ApiMessages.InvalidSession);
-                var result = await _personService.GetPersonById(userId);
-                if (result == null) return NotFound(ApiMessages.PersonNotFound);
+                    return Unauthorized(AuthMessages.InvalidSession);
+                var jwtCookie = Request.Cookies["jwt"];
+                if (string.IsNullOrEmpty(jwtCookie)) return BadRequest(AuthMessages.InvalidSession);
+                var userId = _authService.GetUserIdFromJwt(jwtCookie);
+                if (!int.TryParse(userId, out int parsedUserId)) return BadRequest(AuthMessages.InvalidSession);
+                var result = await _personService.GetPersonById(parsedUserId);
+                if (result == null) return NotFound(AuthMessages.PersonNotFound);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -84,10 +85,11 @@ namespace Biokudi_Backend.UI.Controllers
         }
 
         [HttpPost("logout")]
+        [Authorize]
         public IActionResult Logout()
         {
             _cookieService.RemoveCookies(HttpContext);
-            return Ok(ApiMessages.Logout);
+            return Ok(AuthMessages.Logout);
         }
 
         [HttpGet("public-key")]
@@ -100,7 +102,22 @@ namespace Biokudi_Backend.UI.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ApiMessages.PublicKeyError);
+                return StatusCode(500, AuthMessages.PublicKeyError);
+            }
+        }
+
+        [HttpPost("encrypt-password")]
+        public ActionResult EncryptPassword([FromBody] PasswordRequest request)
+        {
+            if (!_env.IsDevelopment()) return NotFound();
+            try
+            {
+                string encryptedPassword = _rsaUtility.EncryptWithPublicKey(request.Password);
+                return Ok(encryptedPassword);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
     }

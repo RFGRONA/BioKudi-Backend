@@ -1,6 +1,6 @@
 ﻿namespace Biokudi_Backend.UI.Helpers
 {
-    public static class ApiMessages
+    public static class AuthMessages
     {
         public const string CaptchaInvalid = "Captcha Invalido";
         public const string InvalidModel = "Modelo Inválido";
