@@ -26,25 +26,39 @@ namespace Biokudi_Backend.Infrastructure.Services
             return tokenHandler.WriteToken(token);
         }
 
-        public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
+        public string GetUserIdFromJwt(string token)
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
             var keyString = _configuration["Jwt:Key"];
             if (string.IsNullOrEmpty(keyString))
                 throw new ArgumentNullException(nameof(keyString), "JWT key cannot be null or empty.");
-            var key = Encoding.ASCII.GetBytes(keyString);
-            var tokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(key),
-                ValidateIssuer = false,
-                ValidateAudience = false,
-                ValidateLifetime = false, 
-                ClockSkew = TimeSpan.Zero
-            };
 
-            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
-            return principal;
+            var key = Encoding.ASCII.GetBytes(keyString);
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            try
+            {
+                var validationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ClockSkew = TimeSpan.Zero 
+                };
+
+                var principal = tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
+                var userIdClaim = principal.FindFirst(ClaimTypes.NameIdentifier);
+                if (userIdClaim == null)
+                {
+                    throw new SecurityTokenException("Claim NameIdentifier not found in JWT.");
+                }
+
+                return userIdClaim.Value;
+            }
+            catch (Exception ex)
+            {
+                throw new SecurityTokenException("Validación de JWT invalida.", ex);
+            }
         }
     }
 }

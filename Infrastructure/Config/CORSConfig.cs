@@ -24,7 +24,7 @@
 
                 options.AddPolicy("OnlyFrontend", policy =>
                 {
-                    policy.WithOrigins("https://biokudi.vercel.app")
+                    policy.WithOrigins("https://biokudi.site")
                           .AllowAnyMethod()
                           .AllowAnyHeader()
                           .AllowCredentials();
