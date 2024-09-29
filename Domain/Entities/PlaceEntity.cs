@@ -13,16 +13,17 @@ namespace Biokudi_Backend.Domain.Entities
         public string Description { get; set; } = null!;
         public string Link { get; set; } = null!;
         public DateTime DateCreated { get; set; }
-        public DateTime? DateModified { get; set; } 
+        public DateTime? DateModified { get; set; }
         public int? CityId { get; set; }
         public int? StateId { get; set; }
         public CatCityEntity? City { get; set; }
-        public ICollection<PictureEntity> Pictures { get; set; } = [];
-        public ICollection<PostEntity> Posts { get; set; } = [];
-        public ICollection<ReviewEntity> Reviews { get; set; } = [];
         public CatStateEntity? State { get; set; }
-        public ICollection<CatActivityEntity> Activities { get; set; } = [];
-        public ICollection<ListEntity> Lists { get; set; } = [];
+
+        public ICollection<PictureEntity> Pictures { get; set; } = new List<PictureEntity>();
+        public ICollection<PostEntity> Posts { get; set; } = new List<PostEntity>();
+        public ICollection<ReviewEntity> Reviews { get; set; } = new List<ReviewEntity>();
+        public ICollection<CatActivityEntity> Activities { get; set; } = new List<CatActivityEntity>();
+        public ICollection<ListEntity> Lists { get; set; } = new List<ListEntity>();
         public double Rating { get; set; }
     }
 }

@@ -24,11 +24,5 @@ namespace Biokudi_Backend.Domain.Entities
         public CatRole Role { get; set; } = null!;
         public CatState? State { get; set; }
         public ICollection<Ticket> Tickets { get; set; } = [];
-
-        public static DateTime DateNowColombia()
-        {
-            TimeZoneInfo timeZoneColombia = TimeZoneInfo.FindSystemTimeZoneById("SA Pacific Standard Time");
-            return TimeZoneInfo.ConvertTime(DateTime.Now, timeZoneColombia);
-        }
     }
 }
