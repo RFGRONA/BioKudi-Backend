@@ -6,7 +6,7 @@
         Task<IEnumerable<T>?> GetAll();
         Task<T>? Create(T entity);
         Task<bool> Update(T entity);
-        Task<bool> Delete(T entity);
+        Task<bool> Delete(int id);
     }
 
 }
