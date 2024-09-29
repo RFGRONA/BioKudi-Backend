@@ -12,13 +12,6 @@ namespace Biokudi_Backend.Infrastructure.Config
     {
         public static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
-            // Application layer (AddScoped)
-            services.AddScoped<PlaceMapping>();
-            services.AddScoped<EmailUtility>();
-            services.AddSingleton<RSAUtility>();
-            services.AddScoped<IPersonService, PersonService>();
-            services.AddScoped<IPlaceService, PlaceService>();
-
             // Infrastructure layer (AddScoped)
             services.AddScoped<CaptchaService>();
             services.AddScoped<CookiesService>();
@@ -26,9 +19,25 @@ namespace Biokudi_Backend.Infrastructure.Config
             services.AddScoped<ICacheService, CacheService>();
             services.AddScoped<IPersonRepository, PersonRepository>();
             services.AddScoped<IPlaceRepository, PlaceRepository>();
+            services.AddScoped<ICityRepository, CityRepository>();
+            services.AddScoped<IDepartmentRepository, DepartmentRepository>();
+            services.AddScoped<IStateRepository, StateRepository>();
+            services.AddScoped<IActivityRepository, ActivityRepository>();
 
-            // Ui layer (Transient)
-
+            // Application layer (AddScoped)
+            services.AddScoped<PlaceMapping>();
+            services.AddScoped<CityMapping>();
+            services.AddScoped<DepartmentMapping>();
+            services.AddScoped<StateMapping>();
+            services.AddScoped<ActivityMapping>();
+            services.AddSingleton<RSAUtility>();
+            services.AddScoped<EmailUtility>();
+            services.AddScoped<IPersonService, PersonService>();
+            services.AddScoped<IPlaceService, PlaceService>();
+            services.AddScoped<ICityService, CityService>();
+            services.AddScoped<IDepartmentService, DepartmentService>();
+            services.AddScoped<IActivityService, ActivityService>();
+            services.AddScoped<IStateService, StateService>();
         }
     }
 }
