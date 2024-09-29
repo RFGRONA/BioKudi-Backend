@@ -11,7 +11,7 @@
                 SameSite = SameSiteMode.None,
                 Expires = rememberMe ? DateTime.UtcNow.AddMonths(2) : (DateTime?)null,
                 IsEssential = true,
-                //Domain = ".biokudi.site", TODO
+                Domain = ".biokudi.site", 
                 Path = "/"
             };
             context.Response.Cookies.Append("jwt", token, cookieOptions);
@@ -19,7 +19,18 @@
 
         public void RemoveCookies(HttpContext context)
         {
-            context.Response.Cookies.Delete("jwt");
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,           
+                Secure = true,             
+                SameSite = SameSiteMode.None, 
+                Domain = ".biokudi.site",  
+                Path = "/",                
+                Expires = DateTime.UtcNow.AddYears(-1)
+            };
+
+            context.Response.Cookies.Append("jwt", string.Empty, cookieOptions); 
+            context.Response.Cookies.Delete("jwt", cookieOptions); 
         }
     }
 }
