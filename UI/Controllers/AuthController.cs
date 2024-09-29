@@ -32,7 +32,7 @@ namespace Biokudi_Backend.UI.Controllers
                     return BadRequest(AuthMessages.InvalidModel);
                 if (!_env.IsDevelopment() && !await _captchaService.VerifyCaptcha(request.CaptchaToken))
                     return BadRequest(AuthMessages.CaptchaInvalid);
-                var result = _personService.RegisterPerson(request);
+                var result = await _personService.RegisterPerson(request);
                 return NoContent();
             }
             catch (Exception ex)
