@@ -30,6 +30,8 @@ namespace Biokudi_Backend.Application.Services
         {
             try
             {
+                if (!EmailValidatorUtility.ValidateEmailAsync(loginDto.Email).Result)
+                    throw new KeyNotFoundException("Correo invalido");
                 var personEntity = PersonMapping.LoginToPersonEntity(loginDto);
                 var result = await _personRepository.GetAccountByEmail(personEntity.Email);
                 loginDto.Password = _rsaUtility.DecryptWithPrivateKey(loginDto.Password);
@@ -47,9 +49,11 @@ namespace Biokudi_Backend.Application.Services
         {
             try
             {
+                if (!EmailValidatorUtility.ValidateEmailAsync(registerDto.Email).Result)
+                    throw new KeyNotFoundException("Correo invalido");
                 var personEntity = PersonMapping.RegisterToPersonEntity(registerDto);
                 personEntity.Password = _rsaUtility.DecryptWithPrivateKey(personEntity.Password);
-                personEntity.Password = PasswordUtility.HashPassword(registerDto.Password);
+                personEntity.Password = PasswordUtility.HashPassword(personEntity.Password);
                 var result = await _personRepository.Create(personEntity);
                 _emailUtility.SendEmail(result.Email, "Registro exitoso", _emailUtility.CreateAccountAlert(result.NameUser));
                 return registerDto;
