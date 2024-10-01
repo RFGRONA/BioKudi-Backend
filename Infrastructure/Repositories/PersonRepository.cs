@@ -1,4 +1,5 @@
-﻿using Biokudi_Backend.Domain.Entities;
+﻿using Biokudi_Backend.Application.Utilities;
+using Biokudi_Backend.Domain.Entities;
 using Biokudi_Backend.Domain.Interfaces;
 using Biokudi_Backend.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -32,18 +33,20 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                     EmailNotification = user.EmailNotification,
                     EmailPost = user.EmailPost,
                     EmailList = user.EmailList,
-                    DateCreated = PersonEntity.DateNowColombia(),
-                    DateModified = PersonEntity.DateNowColombia()
+                    DateCreated = DateUtility.DateNowColombia(),
+                    DateModified = DateUtility.DateNowColombia()
                 };
                 _context.People.Add(person);
-                _context.SaveChanges();
+                var succes = _context.SaveChanges();
+                if (succes == 0)
+                    throw new InvalidOperationException("Error al guardar los datos en la base de datos");
                 user.IdUser = person.IdUser;
                 return user;
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                throw new Exception($"Error al crear la cuenta");
+                throw new Exception(ex.Message);
             }
         }
 
@@ -83,35 +86,6 @@ namespace Biokudi_Backend.Infrastructure.Repositories
             }
         }
 
-        public Task<bool> Update(PersonEntity entity)
-        {
-            throw new NotImplementedException();
-        }
-        public Task<bool> Delete(PersonEntity entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IEnumerable<PersonEntity>?> GetAccountsByRole(int role)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IEnumerable<PersonEntity>?> GetAccountsByState(int role)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IEnumerable<PersonEntity>?> GetAccountsDeleted()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IEnumerable<PersonEntity>?> GetAll()
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<PersonEntity>? GetById(int id)
         {
             try
@@ -146,6 +120,35 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                 Console.WriteLine(ex.Message);
                 throw new Exception(ex.Message);
             }
+        }
+
+        public Task<bool> Update(PersonEntity user)
+        {
+            throw new NotImplementedException();
+        }
+        public Task<bool> Delete(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<PersonEntity>?> GetAccountsByRole(int role)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<PersonEntity>?> GetAccountsByState(int role)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<PersonEntity>?> GetAccountsDeleted()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<PersonEntity>?> GetAll()
+        {
+            throw new NotImplementedException();
         }
     }
 }

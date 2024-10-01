@@ -10,7 +10,7 @@ namespace Biokudi_Backend.Infrastructure.Repositories
             throw new NotImplementedException();
         }
 
-        public Task<bool> Delete(PictureEntity entity)
+        public Task<bool> Delete(int id)
         {
             throw new NotImplementedException();
         }

@@ -8,5 +8,6 @@ namespace Biokudi_Backend.Application.Interfaces
         Task<LoginResponseDto>? LoginPerson(LoginRequestDto loginDto);
         Task<RegisterRequestDto>? RegisterPerson(RegisterRequestDto registerDto);
         Task<LoginResponseDto>? GetPersonById(int id);
+        Task<ProfileResponseDto>? GetUserProfile(int id);
     }
 }

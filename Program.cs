@@ -1,5 +1,6 @@
 using Biokudi_Backend.Infrastructure.Config;
 using Biokudi_Backend.Infrastructure.Data;
+using Biokudi_Backend.UI.Middleware;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
@@ -35,6 +36,7 @@ app.UseCors("AllAllowed");
 app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
 app.UseAuthentication();
+app.UseTokenRenewal();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();

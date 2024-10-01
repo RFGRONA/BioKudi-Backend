@@ -44,7 +44,10 @@ jobs:
             "Port": "${{ secrets.SMTP_PORT }}",
             "User": "${{ secrets.SMTP_USER }}",
             "Password": "${{ secrets.SMTP_PASSWORD }}"
-          }
+          },
+            "Cookies": {
+              "Domain": "${{ secrets.COOKIES_DOMAIN }}"
+            }
         }' > appsettings.json
     
     - name: Build and publish
