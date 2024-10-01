@@ -6,7 +6,7 @@ namespace Biokudi_Backend.Domain.Entities
     {
         public int IdUser { get; set; }
         public string NameUser { get; set; }
-        public string Telephone { get; set; }
+        public string? Telephone { get; set; }
         public string Email { get; set; }
         public DateTime DateCreated { get; set; } 
         public DateTime? DateModified { get; set; } 
