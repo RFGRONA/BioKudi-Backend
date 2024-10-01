@@ -26,6 +26,19 @@ namespace Biokudi_Backend.Application.Services
             }
         }
 
+        public async Task<ProfileResponseDto>? GetUserProfile(int id)
+        {
+            try
+            {
+                var result = await _personRepository.GetById(id);
+                return PersonMapping.PersonToProfile(result);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
         public async Task<LoginResponseDto?> LoginPerson(LoginRequestDto loginDto)
         {
             try

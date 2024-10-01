@@ -84,6 +84,27 @@ namespace Biokudi_Backend.UI.Controllers
             }
         }
 
+        [HttpGet("profile")]
+        [Authorize]
+        public async Task<IActionResult> Profile()
+        {
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userId) || !int.TryParse(userId, out int parsedUserId))
+                    return BadRequest(AuthMessages.InvalidSession);
+
+                var result = await _personService.GetUserProfile(parsedUserId);
+                if (result == null) return NotFound(AuthMessages.PersonNotFound);
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpPost("logout")]
         [Authorize]
         public IActionResult Logout()
