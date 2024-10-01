@@ -15,7 +15,7 @@ namespace Biokudi_Backend.Infrastructure.Config
             // Infrastructure layer (AddScoped)
             services.AddScoped<CaptchaService>();
             services.AddScoped<CookiesService>();
-            services.AddScoped<AuthService>();
+            services.AddSingleton<AuthService>();
             services.AddScoped<ICacheService, CacheService>();
             services.AddScoped<IPersonRepository, PersonRepository>();
             services.AddScoped<IPlaceRepository, PlaceRepository>();
