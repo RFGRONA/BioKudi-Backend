@@ -1,11 +1,13 @@
 ﻿using Biokudi_Backend.Application.DTOs;
 using Biokudi_Backend.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Biokudi_Backend.UI.Controllers
 {
     [Route("[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin, Editor")]
     public class CityController(ICityService _cityService) : ControllerBase
     {
         private readonly ICityService _cityService = _cityService;

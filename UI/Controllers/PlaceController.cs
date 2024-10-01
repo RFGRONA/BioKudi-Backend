@@ -1,6 +1,7 @@
 ﻿using Biokudi_Backend.Application.DTOs;
 using Biokudi_Backend.Application.DTOs.Request;
 using Biokudi_Backend.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Biokudi_Backend.UI.Controllers
@@ -31,8 +32,8 @@ namespace Biokudi_Backend.UI.Controllers
             
         }
 
-        [HttpGet]
-        [Route("GetPlaceById/{id}")]
+        [HttpGet("{id}")]
+        [Authorize(Roles = "Admin, Editor")]
         public async Task<IActionResult> GetPlaceById(int id)
         {
             try
@@ -52,7 +53,7 @@ namespace Biokudi_Backend.UI.Controllers
         }
 
         [HttpGet]
-        [Route("GetCrudPlaces")]
+        [Authorize(Roles = "Admin, Editor")]
         public async Task<IActionResult> GetPlaces()
         {
             try
@@ -71,7 +72,7 @@ namespace Biokudi_Backend.UI.Controllers
         }
 
         [HttpPost]
-        [Route("CreatePlace")]
+        [Authorize(Roles = "Admin, Editor")]
         public async Task<IActionResult> CreatePlace([FromBody] PlaceRequestDto place)
         {
             try
@@ -89,8 +90,8 @@ namespace Biokudi_Backend.UI.Controllers
             }
         }
 
-        [HttpPut]
-        [Route("UpdatePlace/{id}")]
+        [HttpPut("{id}")]
+        [Authorize(Roles = "Admin, Editor")]
         public async Task<IActionResult> UpdatePlace(int id, [FromBody] PlaceRequestDto place)
         {
             try
@@ -108,8 +109,8 @@ namespace Biokudi_Backend.UI.Controllers
             }
         }
 
-        [HttpDelete]
-        [Route("DeletePlace/{id}")]
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin, Editor")]
         public async Task<IActionResult> DeletePlace(int id)
         {
             try
