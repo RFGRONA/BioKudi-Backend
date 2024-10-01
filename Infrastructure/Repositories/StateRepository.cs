@@ -1,12 +1,15 @@
-﻿using Biokudi_Backend.Domain.Entities;
+﻿using Biokudi_Backend.Application.Interfaces;
+using Biokudi_Backend.Domain.Entities;
 using Biokudi_Backend.Domain.Interfaces;
 using Biokudi_Backend.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace Biokudi_Backend.Infrastructure.Repositories
 {
-    public class StateRepository(ApplicationDbContext context) : IStateRepository
+    public class StateRepository(ICacheService cacheService, ApplicationDbContext context) : IStateRepository
     {
+        private const string CACHE_KEY = "StateCache";
+        private readonly ICacheService _cacheService = cacheService;
         private readonly ApplicationDbContext _context = context;
         public async Task<CatStateEntity>? Create(CatStateEntity entity)
         {
@@ -29,8 +32,8 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                 int rowsAffected = await _context.SaveChangesAsync();
                 if (rowsAffected == 0)
                     throw new InvalidOperationException("No se pudo crear el estado");
-
                 entity.IdState = state.IdState;
+                _cacheService.Remove(CACHE_KEY);
                 return entity;
             }
             catch (Exception ex)
@@ -49,7 +52,7 @@ namespace Biokudi_Backend.Infrastructure.Repositories
 
                 _context.CatStates.Remove(entity);
                 int rowsAffected = await _context.SaveChangesAsync();
-
+                _cacheService.Remove(CACHE_KEY);
                 return rowsAffected > 0;
             }
             catch (Exception ex)
@@ -62,6 +65,10 @@ namespace Biokudi_Backend.Infrastructure.Repositories
         {
             try
             {
+                var cachedPlaces = _cacheService.GetCollection<CatStateEntity>(CACHE_KEY);
+                if (cachedPlaces != null)
+                    return cachedPlaces;
+
                 var states = await _context.CatStates
                     .Select(state => new CatStateEntity
                     {
@@ -83,6 +90,11 @@ namespace Biokudi_Backend.Infrastructure.Repositories
         {
             try
             {
+                var cachedPlaces = _cacheService.GetCollection<CatStateEntity>(CACHE_KEY);
+                var cachedPlace = cachedPlaces?.FirstOrDefault(p => p.IdState == id);
+                if (cachedPlace != null)
+                    return cachedPlace;
+
                 var result = await _context.CatStates.FirstOrDefaultAsync(s => s.IdState == id);
 
                 if (result == null)
@@ -117,7 +129,7 @@ namespace Biokudi_Backend.Infrastructure.Repositories
 
                 _context.CatStates.Update(existingEntity);
                 int rowsAffected = await _context.SaveChangesAsync();
-
+                _cacheService.Remove(CACHE_KEY);
                 return rowsAffected > 0;
             }
             catch (Exception ex)

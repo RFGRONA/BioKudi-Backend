@@ -1,12 +1,15 @@
-﻿using Biokudi_Backend.Domain.Entities;
+﻿using Biokudi_Backend.Application.Interfaces;
+using Biokudi_Backend.Domain.Entities;
 using Biokudi_Backend.Domain.Interfaces;
 using Biokudi_Backend.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace Biokudi_Backend.Infrastructure.Repositories
 {
-    public class DepartmentRepository(ApplicationDbContext context) : IDepartmentRepository
+    public class DepartmentRepository(ICacheService cacheService, ApplicationDbContext context) : IDepartmentRepository
     {
+        private const string CACHE_KEY = "DepartmentCache";
+        private readonly ICacheService _cacheService = cacheService;
         private readonly ApplicationDbContext _context = context;
         public async Task<CatDepartmentEntity>? Create(CatDepartmentEntity entity)
         {
@@ -29,6 +32,7 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                 if (rowsAffected == 0)
                     throw new InvalidOperationException("No se pudo crear el departamento");
                 entity.IdDepartment = department.IdDepartment;
+                _cacheService.Remove(CACHE_KEY);
                 return entity;
             }
             catch (Exception ex)
@@ -47,7 +51,7 @@ namespace Biokudi_Backend.Infrastructure.Repositories
 
                 _context.CatDepartments.Remove(entity);
                 int rowsAffected = await _context.SaveChangesAsync();
-
+                _cacheService.Remove(CACHE_KEY);
                 return rowsAffected > 0;
             }
             catch (Exception ex)
@@ -60,6 +64,10 @@ namespace Biokudi_Backend.Infrastructure.Repositories
         {
             try
             {
+                var cachedPlaces = _cacheService.GetCollection<CatDepartmentEntity>(CACHE_KEY);
+                if (cachedPlaces != null)
+                    return cachedPlaces;
+
                 var departments = await _context.CatDepartments
                     .Select(department => new CatDepartmentEntity
                     {
@@ -80,6 +88,11 @@ namespace Biokudi_Backend.Infrastructure.Repositories
         {
             try
             {
+                var cachedPlaces = _cacheService.GetCollection<CatDepartmentEntity>(CACHE_KEY);
+                var cachedPlace = cachedPlaces?.FirstOrDefault(p => p.IdDepartment == id);
+                if (cachedPlace != null)
+                    return cachedPlace;
+
                 var result = await _context.CatDepartments.FirstOrDefaultAsync(d => d.IdDepartment == id);
 
                 if (result == null)
@@ -112,7 +125,7 @@ namespace Biokudi_Backend.Infrastructure.Repositories
 
                 _context.CatDepartments.Update(existingEntity);
                 int rowsAffected = await _context.SaveChangesAsync();
-
+                _cacheService.Remove(CACHE_KEY);
                 return rowsAffected > 0;
             }
             catch (Exception ex)

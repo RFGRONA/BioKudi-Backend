@@ -1,4 +1,5 @@
 ﻿using Biokudi_Backend.Application.DTOs;
+using Biokudi_Backend.Application.Interfaces;
 using Biokudi_Backend.Domain.Entities;
 using Biokudi_Backend.Domain.Interfaces;
 using Biokudi_Backend.Infrastructure.Data;
@@ -6,8 +7,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Biokudi_Backend.Infrastructure.Repositories
 {
-    public class CityRepository(ApplicationDbContext context) : ICityRepository
+    public class CityRepository(ICacheService cacheService, ApplicationDbContext context) : ICityRepository
     {
+        private const string CACHE_KEY = "CityCache";
+        private readonly ICacheService _cacheService = cacheService;
         private readonly ApplicationDbContext _context = context;
         public async Task<CatCityEntity>? Create(CatCityEntity entity)
         {
@@ -25,6 +28,7 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                 int rowsAffected = await _context.SaveChangesAsync();
                 if (rowsAffected == 0)
                     throw new InvalidOperationException("No se pudo crear la ciudad");
+                _cacheService.Remove(CACHE_KEY);
                 return entity;
             }
             catch (Exception ex)
@@ -42,6 +46,7 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                     throw new Exception("La ciudad no fue encontrada.");
                 _context.CatCities.Remove(entity);
                 int rowsAffected = await _context.SaveChangesAsync();
+                _cacheService.Remove(CACHE_KEY);
                 return rowsAffected > 0; 
             }
             catch (Exception ex)
@@ -54,6 +59,10 @@ namespace Biokudi_Backend.Infrastructure.Repositories
         {
             try
             {
+                var cachedPlaces = _cacheService.GetCollection<CatCityEntity>(CACHE_KEY);
+                if (cachedPlaces != null)
+                    return cachedPlaces;
+
                 var cities = await _context.CatCities
                     .Include(c => c.Department) 
                     .Select(city => new CatCityEntity
@@ -80,6 +89,11 @@ namespace Biokudi_Backend.Infrastructure.Repositories
         {
             try
             {
+                var cachedPlaces = _cacheService.GetCollection<CatCityEntity>(CACHE_KEY);
+                var cachedPlace = cachedPlaces?.FirstOrDefault(p => p.IdCity == id);
+                if (cachedPlace != null)
+                    return cachedPlace;
+
                 var result = await _context.CatCities
                     .Include(c => c.Department) 
                     .FirstOrDefaultAsync(c => c.IdCity == id);
@@ -115,6 +129,7 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                 existingEntity.DepartmentId = entity.DepartmentId;
                 _context.CatCities.Update(existingEntity);
                 int rowsAffected = await _context.SaveChangesAsync();
+                _cacheService.Remove(CACHE_KEY);
                 return rowsAffected > 0; 
             }
             catch (Exception ex)

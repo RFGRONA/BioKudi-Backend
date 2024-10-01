@@ -67,6 +67,7 @@ namespace Biokudi_Backend.Infrastructure.Repositories
             {
                 _context.Places.Remove(new Place { IdPlace = id });
                 _context.SaveChanges();
+                _cacheService.Remove(CACHE_KEY);
                 return Task.FromResult(true);
             }
             catch
@@ -82,7 +83,6 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                 var cachedPlaces = _cacheService.GetCollection<PlaceEntity>(CACHE_KEY);
                 if (cachedPlaces != null)
                     return cachedPlaces;
-                Console.WriteLine(cachedPlaces);
 
                 var places = await _context.Places
                     .Include(p => p.Activities)
@@ -219,7 +219,7 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                     .Where(a => activityIds.Contains(a.IdActivity))
                     .ToListAsync();
                 await _context.SaveChangesAsync();
-
+                _cacheService.Remove(CACHE_KEY);
                 return true;
             }
             catch

@@ -1,12 +1,15 @@
-﻿using Biokudi_Backend.Domain.Entities;
+﻿using Biokudi_Backend.Application.Interfaces;
+using Biokudi_Backend.Domain.Entities;
 using Biokudi_Backend.Domain.Interfaces;
 using Biokudi_Backend.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace Biokudi_Backend.Infrastructure.Repositories
 {
-    public class ActivityRepository(ApplicationDbContext context) : IActivityRepository
+    public class ActivityRepository(ICacheService cacheService, ApplicationDbContext context) : IActivityRepository
     {
+        private const string CACHE_KEY = "ActivityCache";
+        private readonly ICacheService _cacheService = cacheService;
         private readonly ApplicationDbContext _context = context;
 
         public async Task<CatActivityEntity>? Create(CatActivityEntity entity)
@@ -31,8 +34,8 @@ namespace Biokudi_Backend.Infrastructure.Repositories
 
                 if (rowsAffected == 0)
                     throw new InvalidOperationException("No se pudo crear la actividad");
-
                 entity.IdActivity = activity.IdActivity;
+                _cacheService.Remove(CACHE_KEY);
                 return entity;
             }
             catch (Exception ex)
@@ -51,7 +54,7 @@ namespace Biokudi_Backend.Infrastructure.Repositories
 
                 _context.CatActivities.Remove(activity);
                 int rowsAffected = await _context.SaveChangesAsync();
-
+                _cacheService.Remove(CACHE_KEY);
                 return rowsAffected > 0;
             }
             catch (Exception ex)
@@ -64,6 +67,10 @@ namespace Biokudi_Backend.Infrastructure.Repositories
         {
             try
             {
+                var cachedPlaces = _cacheService.GetCollection<CatActivityEntity>(CACHE_KEY);
+                if (cachedPlaces != null)
+                    return cachedPlaces;
+
                 var activities = await _context.CatActivities
                     .Select(a => new CatActivityEntity
                     {
@@ -85,6 +92,11 @@ namespace Biokudi_Backend.Infrastructure.Repositories
         {
             try
             {
+                var cachedPlaces = _cacheService.GetCollection<CatActivityEntity>(CACHE_KEY);
+                var cachedPlace = cachedPlaces?.FirstOrDefault(p => p.IdActivity == id);
+                if (cachedPlace != null)
+                    return cachedPlace;
+
                 var activity = await _context.CatActivities.FirstOrDefaultAsync(a => a.IdActivity == id);
 
                 if (activity == null)
@@ -119,7 +131,7 @@ namespace Biokudi_Backend.Infrastructure.Repositories
 
                 _context.CatActivities.Update(existingActivity);
                 int rowsAffected = await _context.SaveChangesAsync();
-
+                _cacheService.Remove(CACHE_KEY);
                 return rowsAffected > 0;
             }
             catch (Exception ex)
