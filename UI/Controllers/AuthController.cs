@@ -5,6 +5,7 @@ using Biokudi_Backend.Infrastructure.Services;
 using Biokudi_Backend.UI.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Biokudi_Backend.UI.Controllers
 {
@@ -52,8 +53,8 @@ namespace Biokudi_Backend.UI.Controllers
                 if (!_env.IsDevelopment() && !await _captchaService.VerifyCaptcha(request.CaptchaToken))
                     return BadRequest(AuthMessages.CaptchaInvalid);
                 var result = await _personService.LoginPerson(request);
-                var token = _authService.GenerateJwtToken(result.UserId.ToString(), request.RememberMe);
-                _cookieService.SetAuthCookies(HttpContext, token, request.RememberMe);
+                var token = _authService.GenerateTokens(result.UserId.ToString(), result.Role);
+                _cookieService.SetAuthCookies(HttpContext, token.JwtToken, token.RefreshToken, request.RememberMe);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -68,14 +69,13 @@ namespace Biokudi_Backend.UI.Controllers
         {
             try
             {
-                if (!User.Identity.IsAuthenticated)
-                    return Unauthorized(AuthMessages.InvalidSession);
-                var jwtCookie = Request.Cookies["jwt"];
-                if (string.IsNullOrEmpty(jwtCookie)) return BadRequest(AuthMessages.InvalidSession);
-                var userId = _authService.GetUserIdFromJwt(jwtCookie);
-                if (!int.TryParse(userId, out int parsedUserId)) return BadRequest(AuthMessages.InvalidSession);
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userId) || !int.TryParse(userId, out int parsedUserId))
+                    return BadRequest(AuthMessages.InvalidSession);
+
                 var result = await _personService.GetPersonById(parsedUserId);
                 if (result == null) return NotFound(AuthMessages.PersonNotFound);
+
                 return Ok(result);
             }
             catch (Exception ex)

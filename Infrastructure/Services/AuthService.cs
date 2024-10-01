@@ -3,62 +3,99 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace Biokudi_Backend.Infrastructure.Services
+public class AuthService
 {
-    public class AuthService(IConfiguration _configuration)
+    private readonly IConfiguration _configuration;
+    private readonly ILogger<AuthService> _logger;
+
+    public AuthService(IConfiguration configuration, ILogger<AuthService> logger)
     {
-        private readonly IConfiguration _configuration = _configuration;
-        public string GenerateJwtToken(string userId, bool rememberMe)
-        {
-            var keyString = _configuration["Jwt:Key"];
-            if (string.IsNullOrEmpty(keyString))
-                throw new ArgumentNullException(nameof(keyString), "JWT key cannot be null or empty.");
-            var key = Encoding.ASCII.GetBytes(keyString);
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, userId) }),
-                Expires = rememberMe ? DateTime.UtcNow.AddMonths(2) : DateTime.UtcNow.AddHours(6),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
+        _configuration = configuration;
+        _logger = logger;
+    }
 
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
+    public (string JwtToken, string RefreshToken) GenerateTokens(string userId, string role)
+    {
+        var jwtToken = GenerateJwtToken(userId, role);
+        var refreshToken = GenerateRefreshToken(userId, role);
+        return (jwtToken, refreshToken);
+    }
+
+    private string GenerateJwtToken(string userId, string role)
+    {
+        var keyString = _configuration["Jwt:Key"];
+        var key = Encoding.ASCII.GetBytes(keyString);
+        var tokenHandler = new JwtSecurityTokenHandler();
+
+        var claims = new[]
+        {
+            new Claim(ClaimTypes.NameIdentifier, userId),
+            new Claim(ClaimTypes.Role, role) 
+        };
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(claims),
+            Expires = DateTime.UtcNow.AddSeconds(30), //CAMBIAR
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+        };
+
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+        return tokenHandler.WriteToken(token);
+    }
+
+    private string GenerateRefreshToken(string userId, string role)
+    {
+        var keyString = _configuration["Jwt:Key"];
+        var key = Encoding.ASCII.GetBytes(keyString);
+        var tokenHandler = new JwtSecurityTokenHandler();
+
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(new[]
+            {
+            new Claim(ClaimTypes.NameIdentifier, userId),
+            new Claim(ClaimTypes.Role, role),
+            new Claim("token_type", "refresh") 
+        }),
+            Expires = DateTime.UtcNow.AddDays(7),
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+        };
+
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+        return tokenHandler.WriteToken(token);
+    }
+
+
+    public ClaimsPrincipal? ValidateRefreshToken(string refreshToken)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var keyString = _configuration["Jwt:Key"];
+        var key = Encoding.ASCII.GetBytes(keyString);
+
+        try
+        {
+            var principal = tokenHandler.ValidateToken(refreshToken, new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ClockSkew = TimeSpan.Zero,
+            }, out SecurityToken validatedToken);
+
+            var tokenTypeClaim = principal.FindFirst("token_type")?.Value;
+            if (tokenTypeClaim != "refresh")
+            {
+                throw new SecurityTokenException("Invalid token type");
+            }
+
+            return principal;
         }
-
-        public string GetUserIdFromJwt(string token)
+        catch (SecurityTokenException ex)
         {
-            var keyString = _configuration["Jwt:Key"];
-            if (string.IsNullOrEmpty(keyString))
-                throw new ArgumentNullException(nameof(keyString), "JWT key cannot be null or empty.");
-
-            var key = Encoding.ASCII.GetBytes(keyString);
-            var tokenHandler = new JwtSecurityTokenHandler();
-
-            try
-            {
-                var validationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                    ClockSkew = TimeSpan.Zero 
-                };
-
-                var principal = tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
-                var userIdClaim = principal.FindFirst(ClaimTypes.NameIdentifier);
-                if (userIdClaim == null)
-                {
-                    throw new SecurityTokenException("Claim NameIdentifier not found in JWT.");
-                }
-
-                return userIdClaim.Value;
-            }
-            catch (Exception ex)
-            {
-                throw new SecurityTokenException("Validación de JWT invalida.", ex);
-            }
+            _logger.LogWarning("Invalid refresh token: {Message}", ex.Message);
+            return null;
         }
     }
+
 }
