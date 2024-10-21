@@ -1,6 +1,7 @@
 using Biokudi_Backend.Infrastructure.Config;
 using Biokudi_Backend.Infrastructure.Data;
 using Biokudi_Backend.UI.Middleware;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
@@ -21,11 +22,10 @@ builder.Services.AddHttpClient();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
+builder.Services.ConfigureSwagger();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -35,6 +35,7 @@ if (app.Environment.IsDevelopment())
 app.UseCors("AllAllowed");
 app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
+app.UseExceptionHandling();
 app.UseAuthentication();
 app.UseTokenRenewal();
 app.UseAuthorization();
