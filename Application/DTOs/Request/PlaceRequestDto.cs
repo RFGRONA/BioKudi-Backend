@@ -10,6 +10,7 @@
         public string Link { get; set; } = null!;
         public int? CityId { get; set; }
         public int? StateId { get; set; }
+        public string? Picture { get; set; }
         public List<IdActivityDto> Activities { get; set; } = null!;
     }
 }
