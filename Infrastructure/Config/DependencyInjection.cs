@@ -17,27 +17,44 @@ namespace Biokudi_Backend.Infrastructure.Config
             services.AddScoped<CookiesService>();
             services.AddSingleton<AuthService>();
             services.AddScoped<ICacheService, CacheService>();
+
             services.AddScoped<IPersonRepository, PersonRepository>();
             services.AddScoped<IPlaceRepository, PlaceRepository>();
             services.AddScoped<ICityRepository, CityRepository>();
             services.AddScoped<IDepartmentRepository, DepartmentRepository>();
             services.AddScoped<IStateRepository, StateRepository>();
             services.AddScoped<IActivityRepository, ActivityRepository>();
+            services.AddScoped<ITypeRepository, TypeRepository>();
+            services.AddScoped<IPictureRepository, PictureRepository>();
+            services.AddScoped<IRoleRepository, RoleRepository>();
+            services.AddScoped<IReviewRepository, ReviewRepository>();
 
             // Application layer (AddScoped)
+            services.AddSingleton<RSAUtility>();
+            services.AddScoped<EmailUtility>();
+
+            services.AddScoped<PersonMapping>();
             services.AddScoped<PlaceMapping>();
             services.AddScoped<CityMapping>();
             services.AddScoped<DepartmentMapping>();
             services.AddScoped<StateMapping>();
             services.AddScoped<ActivityMapping>();
-            services.AddSingleton<RSAUtility>();
-            services.AddScoped<EmailUtility>();
+            services.AddScoped<TypeMapping>();
+            services.AddScoped<PictureMapping>();
+            services.AddScoped<RoleMapping>();
+            services.AddScoped<ReviewMapping>();
+
             services.AddScoped<IPersonService, PersonService>();
             services.AddScoped<IPlaceService, PlaceService>();
             services.AddScoped<ICityService, CityService>();
             services.AddScoped<IDepartmentService, DepartmentService>();
             services.AddScoped<IActivityService, ActivityService>();
             services.AddScoped<IStateService, StateService>();
+            services.AddScoped<ITypeService, TypeService>();
+            services.AddScoped<ITableRelationService, TableRelationService>();
+            services.AddScoped<IPictureService, PictureService>();
+            services.AddScoped<IRoleService, RoleService>();
+            services.AddScoped<IReviewService, ReviewService>();
         }
     }
 }
