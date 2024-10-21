@@ -4,6 +4,6 @@
     {
         public int IdType { get; set; }
         public string NameType { get; set; }
-        public string TableRelation { get; set; }
+        public string? TableRelation { get; set; }
     }
 }
