@@ -1,26 +1,27 @@
 ﻿using Biokudi_Backend.Domain.Entities;
 using Biokudi_Backend.Domain.Interfaces;
+using Biokudi_Backend.Domain.ValueObject;
 
 namespace Biokudi_Backend.Infrastructure.Repositories
 {
     public class TagRepository : ITagRepository
     {
-        public Task<CatTagEntity>? Create(CatTagEntity entity)
+        public Task<Result<CatTagEntity>> Create(CatTagEntity entity)
         {
             throw new NotImplementedException();
         }
 
-        public Task<bool> Delete(int id)
+        public Task<Result<bool>> Delete(int id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<CatTagEntity>?> GetAll()
+        public Task<Result<IEnumerable<CatTagEntity>>> GetAll()
         {
             throw new NotImplementedException();
         }
 
-        public Task<CatTagEntity>? GetById(int id)
+        public Task<Result<CatTagEntity>> GetById(int id)
         {
             throw new NotImplementedException();
         }
@@ -30,7 +31,7 @@ namespace Biokudi_Backend.Infrastructure.Repositories
             throw new NotImplementedException();
         }
 
-        public Task<bool> Update(CatTagEntity entity)
+        public Task<Result<bool>> Update(CatTagEntity entity)
         {
             throw new NotImplementedException();
         }

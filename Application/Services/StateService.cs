@@ -2,6 +2,7 @@
 using Biokudi_Backend.Application.Interfaces;
 using Biokudi_Backend.Application.Mappings;
 using Biokudi_Backend.Domain.Interfaces;
+using Biokudi_Backend.Domain.ValueObject;
 
 namespace Biokudi_Backend.Application.Services
 {
@@ -9,71 +10,42 @@ namespace Biokudi_Backend.Application.Services
     {
         private readonly StateMapping _stateMapping = stateMapping;
         private readonly IStateRepository _stateRepository = stateRepository;
-        public async Task<bool> CreateState(StateRequestDto state)
+
+        public async Task<Result<bool>> CreateState(StateRequestDto state)
         {
-            try
-            {
-                var result = await _stateRepository.Create(_stateMapping.RequestToEntity(state));
-                return result != null;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            var entity = _stateMapping.RequestToEntity(state);
+            var result = await _stateRepository.Create(entity);
+            return result.IsSuccess ? Result<bool>.Success(true) : Result<bool>.Failure(result.ErrorMessage);
         }
 
-        public async Task<bool> DeleteState(int id)
+        public async Task<Result<bool>> DeleteState(int id)
         {
-            try
-            {
-                var result = await _stateRepository.Delete(id);
-                return result;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            var result = await _stateRepository.Delete(id);
+            return result.IsSuccess ? Result<bool>.Success(true) : Result<bool>.Failure(result.ErrorMessage);
         }
 
-        public async Task<StateDto?> GetStateById(int id)
+        public async Task<Result<StateDto>> GetStateById(int id)
         {
-            try
-            {
-                var result = await _stateRepository.GetById(id);
-                return _stateMapping.EntityToDto(result);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            var result = await _stateRepository.GetById(id);
+            return result.IsSuccess
+                ? Result<StateDto>.Success(_stateMapping.EntityToDto(result.Value))
+                : Result<StateDto>.Failure(result.ErrorMessage);
         }
 
-        public async Task<List<StateDto>?> GetStates()
+        public async Task<Result<List<StateDto>>> GetStates()
         {
-            try
-            {
-                var result = await _stateRepository.GetAll();
-                return result?.Select(state => _stateMapping.EntityToDto(state)).ToList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            var result = await _stateRepository.GetAll();
+            return result.IsSuccess
+                ? Result<List<StateDto>>.Success(result.Value.Select(state => _stateMapping.EntityToDto(state)).ToList())
+                : Result<List<StateDto>>.Failure(result.ErrorMessage);
         }
 
-        public async Task<bool> UpdateState(int id, StateRequestDto state)
+        public async Task<Result<bool>> UpdateState(int id, StateRequestDto state)
         {
-            try
-            {
-                var entity = _stateMapping.RequestToEntity(state);
-                entity.IdState = id;
-                var result = await _stateRepository.Update(entity);
-                return result;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            var entity = _stateMapping.RequestToEntity(state);
+            entity.IdState = id;
+            var result = await _stateRepository.Update(entity);
+            return result.IsSuccess ? Result<bool>.Success(true) : Result<bool>.Failure(result.ErrorMessage);
         }
     }
 }

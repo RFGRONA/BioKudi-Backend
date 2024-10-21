@@ -1,21 +1,22 @@
 ﻿using Biokudi_Backend.Domain.Entities;
 using Biokudi_Backend.Domain.Interfaces;
+using Biokudi_Backend.Domain.ValueObject;
 
 namespace Biokudi_Backend.Infrastructure.Repositories
 {
     public class AuditRepository : IAuditRepository
     {
-        public Task<AuditEntity>? Create(AuditEntity entity)
+        public Task<Result<AuditEntity>> Create(AuditEntity entity)
         {
             throw new NotImplementedException();
         }
 
-        public Task<bool> Delete(int id)
+        public Task<Result<bool>> Delete(int id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<AuditEntity>?> GetAll()
+        public Task<Result<IEnumerable<AuditEntity>>> GetAll()
         {
             throw new NotImplementedException();
         }
@@ -35,7 +36,7 @@ namespace Biokudi_Backend.Infrastructure.Repositories
             throw new NotImplementedException();
         }
 
-        public Task<AuditEntity>? GetById(int id)
+        public Task<Result<AuditEntity>> GetById(int id)
         {
             throw new NotImplementedException();
         }
@@ -55,7 +56,7 @@ namespace Biokudi_Backend.Infrastructure.Repositories
             throw new NotImplementedException();
         }
 
-        public Task<bool> Update(AuditEntity entity)
+        public Task<Result<bool>> Update(AuditEntity entity)
         {
             throw new NotImplementedException();
         }

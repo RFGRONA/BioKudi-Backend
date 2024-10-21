@@ -1,8 +1,10 @@
 ﻿using Biokudi_Backend.Application.Interfaces;
 using Biokudi_Backend.Domain.Entities;
 using Biokudi_Backend.Domain.Interfaces;
+using Biokudi_Backend.Domain.ValueObject;
 using Biokudi_Backend.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace Biokudi_Backend.Infrastructure.Repositories
 {
@@ -11,16 +13,17 @@ namespace Biokudi_Backend.Infrastructure.Repositories
         private const string CACHE_KEY = "StateCache";
         private readonly ICacheService _cacheService = cacheService;
         private readonly ApplicationDbContext _context = context;
-        public async Task<CatStateEntity>? Create(CatStateEntity entity)
+
+        public async Task<Result<CatStateEntity>> Create(CatStateEntity entity)
         {
             try
             {
-                var result = await _context.CatStates
+                var existingState = await _context.CatStates
                     .Where(s => s.NameState == entity.NameState)
                     .FirstOrDefaultAsync();
 
-                if (result != null)
-                    throw new InvalidOperationException("El estado ya existe");
+                if (existingState != null)
+                    return Result<CatStateEntity>.Failure("El estado ya existe");
 
                 var state = new CatState
                 {
@@ -31,43 +34,44 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                 await _context.CatStates.AddAsync(state);
                 int rowsAffected = await _context.SaveChangesAsync();
                 if (rowsAffected == 0)
-                    throw new InvalidOperationException("No se pudo crear el estado");
+                    return Result<CatStateEntity>.Failure("No se pudo crear el estado");
+
                 entity.IdState = state.IdState;
                 _cacheService.Remove(CACHE_KEY);
-                return entity;
+                return Result<CatStateEntity>.Success(entity);
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error al crear el estado");
+                return Result<CatStateEntity>.Failure($"Error al crear el estado: {ex.Message}");
             }
         }
 
-        public async Task<bool> Delete(int id)
+        public async Task<Result<bool>> Delete(int id)
         {
             try
             {
                 var entity = await _context.CatStates.FindAsync(id);
                 if (entity == null)
-                    throw new Exception("El estado no fue encontrado.");
+                    return Result<bool>.Failure("El estado no fue encontrado.");
 
                 _context.CatStates.Remove(entity);
                 int rowsAffected = await _context.SaveChangesAsync();
                 _cacheService.Remove(CACHE_KEY);
-                return rowsAffected > 0;
+                return Result<bool>.Success(rowsAffected > 0);
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error al eliminar el estado");
+                return Result<bool>.Failure($"Error al eliminar el estado: {ex.Message}");
             }
         }
 
-        public async Task<IEnumerable<CatStateEntity>?> GetAll()
+        public async Task<Result<IEnumerable<CatStateEntity>>> GetAll()
         {
             try
             {
-                var cachedPlaces = _cacheService.GetCollection<CatStateEntity>(CACHE_KEY);
-                if (cachedPlaces != null)
-                    return cachedPlaces;
+                var cachedStates = _cacheService.GetCollection<CatStateEntity>(CACHE_KEY);
+                if (cachedStates != null)
+                    return Result<IEnumerable<CatStateEntity>>.Success(cachedStates);
 
                 var states = await _context.CatStates
                     .Select(state => new CatStateEntity
@@ -77,28 +81,28 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                         TableRelation = state.TableRelation ?? string.Empty
                     })
                     .ToListAsync();
-
-                return states;
+                _cacheService.SetCollection(CACHE_KEY, states, TimeSpan.FromHours(1));
+                return Result<IEnumerable<CatStateEntity>>.Success(states);
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error al obtener los estados");
+                return Result<IEnumerable<CatStateEntity>>.Failure($"Error al obtener los estados: {ex.Message}");
             }
         }
 
-        public async Task<CatStateEntity>? GetById(int id)
+        public async Task<Result<CatStateEntity>> GetById(int id)
         {
             try
             {
-                var cachedPlaces = _cacheService.GetCollection<CatStateEntity>(CACHE_KEY);
-                var cachedPlace = cachedPlaces?.FirstOrDefault(p => p.IdState == id);
-                if (cachedPlace != null)
-                    return cachedPlace;
+                var cachedStates = _cacheService.GetCollection<CatStateEntity>(CACHE_KEY);
+                var cachedState = cachedStates?.FirstOrDefault(p => p.IdState == id);
+                if (cachedState != null)
+                    return Result<CatStateEntity>.Success(cachedState);
 
                 var result = await _context.CatStates.FirstOrDefaultAsync(s => s.IdState == id);
 
                 if (result == null)
-                    throw new Exception("El estado no fue encontrado.");
+                    return Result<CatStateEntity>.Failure("El estado no fue encontrado.");
 
                 var state = new CatStateEntity
                 {
@@ -107,22 +111,21 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                     TableRelation = result.TableRelation ?? string.Empty
                 };
 
-                return state;
+                return Result<CatStateEntity>.Success(state);
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error al obtener el estado con ID {id}");
+                return Result<CatStateEntity>.Failure($"Error al obtener el estado con ID {id}: {ex.Message}");
             }
         }
 
-        public async Task<bool> Update(CatStateEntity entity)
+        public async Task<Result<bool>> Update(CatStateEntity entity)
         {
             try
             {
                 var existingEntity = await _context.CatStates.FindAsync(entity.IdState);
-
                 if (existingEntity == null)
-                    throw new Exception("El estado no fue encontrado.");
+                    return Result<bool>.Failure("El estado no fue encontrado.");
 
                 existingEntity.NameState = entity.NameState;
                 existingEntity.TableRelation = entity.TableRelation;
@@ -130,11 +133,11 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                 _context.CatStates.Update(existingEntity);
                 int rowsAffected = await _context.SaveChangesAsync();
                 _cacheService.Remove(CACHE_KEY);
-                return rowsAffected > 0;
+                return Result<bool>.Success(rowsAffected > 0);
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error al actualizar el estado");
+                return Result<bool>.Failure($"Error al actualizar el estado: {ex.Message}");
             }
         }
 

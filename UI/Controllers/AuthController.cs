@@ -1,5 +1,7 @@
-﻿using Biokudi_Backend.Application.DTOs.Request;
+﻿using Biokudi_Backend.Application.DTOs;
+using Biokudi_Backend.Application.DTOs.Request;
 using Biokudi_Backend.Application.Interfaces;
+using Biokudi_Backend.Application.Services;
 using Biokudi_Backend.Application.Utilities;
 using Biokudi_Backend.Infrastructure.Services;
 using Biokudi_Backend.UI.Helpers;
@@ -23,44 +25,39 @@ namespace Biokudi_Backend.UI.Controllers
         private readonly RSAUtility _rsaUtility = _rsaUtility;
         private readonly IWebHostEnvironment _env = _env;
 
-        [HttpPost]
-        [Route("register")]
+        [HttpPost("register")]
         public async Task<IActionResult> RegisterPerson([FromBody] RegisterRequestDto request)
         {
-            try
-            {
-                if (!ModelState.IsValid)
-                    return BadRequest(AuthMessages.InvalidModel);
-                if (!_env.IsDevelopment() && !await _captchaService.VerifyCaptcha(request.CaptchaToken))
-                    return BadRequest(AuthMessages.CaptchaInvalid);
-                var result = await _personService.RegisterPerson(request);
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            if (!ModelState.IsValid)
+                return BadRequest("Modelo no válido.");
+
+            if (!_env.IsDevelopment() && !await _captchaService.VerifyCaptcha(request.CaptchaToken))
+                return BadRequest("Captcha inválido.");
+
+            var result = await _personService.RegisterPerson(request);
+            if (result.IsFailure)
+                return BadRequest(result.ErrorMessage);
+
+            return NoContent();
         }
 
-        [HttpPost]
-        [Route("login")]
+        [HttpPost("login")]
         public async Task<IActionResult> LoginPerson([FromBody] LoginRequestDto request)
         {
-            try
-            {
-                if (!ModelState.IsValid)
-                    return BadRequest(AuthMessages.InvalidModel);
-                if (!_env.IsDevelopment() && !await _captchaService.VerifyCaptcha(request.CaptchaToken))
-                    return BadRequest(AuthMessages.CaptchaInvalid);
-                var result = await _personService.LoginPerson(request);
-                var token = _authService.GenerateTokens(result.UserId.ToString(), result.Role);
-                _cookieService.SetAuthCookies(HttpContext, token.JwtToken, token.RefreshToken, request.RememberMe);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return Unauthorized(ex.Message);
-            }
+            if (!ModelState.IsValid)
+                return BadRequest("Modelo no válido.");
+
+            if (!_env.IsDevelopment() && !await _captchaService.VerifyCaptcha(request.CaptchaToken))
+                return BadRequest("Captcha inválido.");
+
+            var result = await _personService.LoginPerson(request);
+            if (result.IsFailure)
+                return NotFound(result.ErrorMessage);
+
+            var token = _authService.GenerateTokens(result.Value.UserId.ToString(), result.Value.Role);
+            _cookieService.SetAuthCookies(HttpContext, token.JwtToken, token.RefreshToken, request.RememberMe);
+
+            return Ok(result.Value);
         }
 
         [HttpGet("check-session")]
@@ -74,13 +71,17 @@ namespace Biokudi_Backend.UI.Controllers
                     return BadRequest(AuthMessages.InvalidSession);
 
                 var result = await _personService.GetPersonById(parsedUserId);
-                if (result == null) return NotFound(AuthMessages.PersonNotFound);
 
-                return Ok(result);
+                if (result.IsFailure)
+                    return BadRequest(result.ErrorMessage);
+                if (result.Value == null)
+                    return NotFound(AuthMessages.PersonNotFound);
+
+                return Ok(result.Value);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return StatusCode(500, ex.Message);
             }
         }
 
@@ -95,13 +96,67 @@ namespace Biokudi_Backend.UI.Controllers
                     return BadRequest(AuthMessages.InvalidSession);
 
                 var result = await _personService.GetUserProfile(parsedUserId);
-                if (result == null) return NotFound(AuthMessages.PersonNotFound);
 
-                return Ok(result);
+                if (result.IsFailure)
+                    return BadRequest(result.ErrorMessage);
+                if (result.Value == null)
+                    return NotFound(AuthMessages.PersonNotFound);
+
+                return Ok(result.Value);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpPut("update-profile")]
+        [Authorize]
+        public async Task<IActionResult> UpdateProfile([FromBody] PersonRequestDto person)
+        {
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userId) || !int.TryParse(userId, out int parsedUserId))
+                    return BadRequest(AuthMessages.InvalidSession);
+
+                var result = await _personService.UpdateUserProfile(parsedUserId, person);
+
+                if (result.IsFailure)
+                    return BadRequest(result.ErrorMessage);
+                if (!result.Value)
+                    return NotFound(AuthMessages.PersonNotFound);
+
+                return Ok(result.Value);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpDelete("delete-profile")]
+        [Authorize]
+        public async Task<IActionResult> Delete()
+        {
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userId) || !int.TryParse(userId, out int parsedUserId))
+                    return BadRequest(AuthMessages.InvalidSession);
+
+                var result = await _personService.DeleteUser(parsedUserId);
+
+                if (result.IsFailure)
+                    return BadRequest(result.ErrorMessage);
+                if (!result.Value)
+                    return NotFound(AuthMessages.PersonNotFound);
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
             }
         }
 
@@ -138,7 +193,7 @@ namespace Biokudi_Backend.UI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(ex);
             }
         }
     }

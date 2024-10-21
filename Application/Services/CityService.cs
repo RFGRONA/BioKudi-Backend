@@ -2,6 +2,7 @@
 using Biokudi_Backend.Application.Interfaces;
 using Biokudi_Backend.Application.Mappings;
 using Biokudi_Backend.Domain.Interfaces;
+using Biokudi_Backend.Domain.ValueObject;
 using Biokudi_Backend.Infrastructure.Repositories;
 
 namespace Biokudi_Backend.Application.Services
@@ -10,71 +11,41 @@ namespace Biokudi_Backend.Application.Services
     {
         private readonly CityMapping _cityMapping = _cityMapping;
         private readonly ICityRepository _cityRepository = _cityRepository;
-        public async Task<bool> CreateCity(CityRequestDto city)
+
+        public async Task<Result<bool>> CreateCity(CityRequestDto city)
         {
-            try
-            {
-                var result = await _cityRepository.Create(_cityMapping.RequestToEntity(city));
-                return result!=null;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            var result = await _cityRepository.Create(_cityMapping.RequestToEntity(city));
+            return result.IsSuccess
+                ? Result<bool>.Success(true)
+                : Result<bool>.Failure(result.ErrorMessage);
         }
 
-        public async Task<bool> DeleteCity(int id)
+        public async Task<Result<bool>> DeleteCity(int id)
         {
-            try
-            {
-                var result = await _cityRepository.Delete(id);
-                return result;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            return await _cityRepository.Delete(id);
         }
 
-        public async Task<List<CityDto>?> GetCities()
+        public async Task<Result<List<CityDto>>> GetCities()
         {
-            try
-            {
-                var result = await _cityRepository.GetAll();
-                return result.Select(city => _cityMapping.EntityToDto(city)).ToList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            var result = await _cityRepository.GetAll();
+            return result.IsSuccess
+                ? Result<List<CityDto>>.Success(result.Value.Select(city => _cityMapping.EntityToDto(city)).ToList())
+                : Result<List<CityDto>>.Failure(result.ErrorMessage);
         }
 
-        public async Task<CityDto?> GetCityById(int id)
+        public async Task<Result<CityDto>> GetCityById(int id)
         {
-            try
-            {
-                var result = await _cityRepository.GetById(id);
-                return _cityMapping.EntityToDto(result);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            var result = await _cityRepository.GetById(id);
+            return result.IsSuccess
+                ? Result<CityDto>.Success(_cityMapping.EntityToDto(result.Value))
+                : Result<CityDto>.Failure(result.ErrorMessage);
         }
 
-        public async Task<bool> UpdateCity(int id, CityRequestDto city)
+        public async Task<Result<bool>> UpdateCity(int id, CityRequestDto city)
         {
-            try
-            {
-                var entity = _cityMapping.RequestToEntity(city);
-                entity.IdCity = id;
-                var result = await _cityRepository.Update(entity);
-                return result;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            var entity = _cityMapping.RequestToEntity(city);
+            entity.IdCity = id;
+            return await _cityRepository.Update(entity);
         }
     }
 }

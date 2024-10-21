@@ -16,117 +16,64 @@ namespace Biokudi_Backend.UI.Controllers
         [Route("GetStartCarrousel")]
         public async Task<IActionResult> GetStartCarrousel()
         {
-            try
-            {
-                var result = await _placeService.GetStartCarrousel();
-                if (result != null)
-                {
-                    return Ok(result);
-                }
-                return NotFound();
-            } 
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            
+            var result = await _placeService.GetStartCarrousel();
+            return result.IsSuccess ? Ok(result.Value) : NotFound(result.ErrorMessage);
+        }
+
+        [HttpGet]
+        [Route("GetListActivities")]
+        public async Task<IActionResult> GetListActivities()
+        {
+            var result = await _placeService.GetListActivities();
+            return result.IsSuccess ? Ok(result.Value) : NotFound(result.ErrorMessage);
+        }
+
+        [HttpGet]
+        [Route("GetListPointMap")]
+        public async Task<IActionResult> GetListPointMap()
+        {
+            var result = await _placeService.GetListPointMap();
+            return result.IsSuccess ? Ok(result.Value) : NotFound(result.ErrorMessage);
         }
 
         [HttpGet("{id}")]
         [Authorize(Roles = "Admin, Editor")]
         public async Task<IActionResult> GetPlaceById(int id)
         {
-            try
-            { 
-                var result = await _placeService.GetPlaceById(id);
-                if (result != null)
-                {
-                    return Ok(result);
-                }
-                return NotFound();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            
+            var result = await _placeService.GetPlaceById(id);
+            return result.IsSuccess ? Ok(result.Value) : NotFound(result.ErrorMessage);
         }
 
         [HttpGet]
         [Authorize(Roles = "Admin, Editor")]
         public async Task<IActionResult> GetPlaces()
         {
-            try
-            {
-                var result = await _placeService.GetCrudPlaces();
-                if (result != null)
-                {
-                    return Ok(result);
-                }
-                return NotFound();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var result = await _placeService.GetCrudPlaces();
+            return result.IsSuccess ? Ok(result.Value) : NotFound(result.ErrorMessage);
         }
 
         [HttpPost]
         [Authorize(Roles = "Admin, Editor")]
         public async Task<IActionResult> CreatePlace([FromBody] PlaceRequestDto place)
         {
-            try
-            {
-                var result = await _placeService.CreatePlace(place);
-                if (result == true)
-                {
-                    return Ok();
-                }
-                return BadRequest();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var result = await _placeService.CreatePlace(place);
+            return result.IsSuccess ? Ok() : BadRequest(result.ErrorMessage);
         }
 
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin, Editor")]
         public async Task<IActionResult> UpdatePlace(int id, [FromBody] PlaceRequestDto place)
         {
-            try
-            {
-                var result = await _placeService.UpdatePlace(id, place);
-                if (result == null)
-                {
-                    return Ok();
-                }
-                return BadRequest();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var result = await _placeService.UpdatePlace(id, place);
+            return result.IsSuccess ? Ok() : BadRequest(result.ErrorMessage);
         }
 
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin, Editor")]
         public async Task<IActionResult> DeletePlace(int id)
         {
-            try
-            {
-                var result = await _placeService.DeletePlace(id);
-                if (result == true)
-                {
-                    return Ok();
-                }
-                return BadRequest();
-            } 
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var result = await _placeService.DeletePlace(id);
+            return result.IsSuccess ? Ok() : BadRequest(result.ErrorMessage);
         }
-
     }
 }

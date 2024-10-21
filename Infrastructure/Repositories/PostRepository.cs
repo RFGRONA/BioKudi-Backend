@@ -1,26 +1,27 @@
 ﻿using Biokudi_Backend.Domain.Entities;
 using Biokudi_Backend.Domain.Interfaces;
+using Biokudi_Backend.Domain.ValueObject;
 
 namespace Biokudi_Backend.Infrastructure.Repositories
 {
     public class PostRepository : IPostRepository
     {
-        public Task<PostEntity>? Create(PostEntity entity)
+        public Task<Result<PostEntity>> Create(PostEntity entity)
         {
             throw new NotImplementedException();
         }
 
-        public Task<bool> Delete(int id)
+        public Task<Result<bool>> Delete(int id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<PostEntity>?> GetAll()
+        public Task<Result<IEnumerable<PostEntity>>> GetAll()
         {
             throw new NotImplementedException();
         }
 
-        public Task<PostEntity>? GetById(int id)
+        public Task<Result<PostEntity>> GetById(int id)
         {
             throw new NotImplementedException();
         }
@@ -30,7 +31,7 @@ namespace Biokudi_Backend.Infrastructure.Repositories
             throw new NotImplementedException();
         }
 
-        public Task<bool> Update(PostEntity entity)
+        public Task<Result<bool>> Update(PostEntity entity)
         {
             throw new NotImplementedException();
         }

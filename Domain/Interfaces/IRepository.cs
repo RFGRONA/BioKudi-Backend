@@ -1,12 +1,14 @@
-﻿namespace Biokudi_Backend.Domain.Interfaces
+﻿using Biokudi_Backend.Domain.ValueObject;
+
+namespace Biokudi_Backend.Domain.Interfaces
 {
     public interface IRepository<T> where T : class
     {
-        Task<T>? GetById(int id);
-        Task<IEnumerable<T>?> GetAll();
-        Task<T>? Create(T entity);
-        Task<bool> Update(T entity);
-        Task<bool> Delete(int id);
+        Task<Result<T>> GetById(int id);                  
+        Task<Result<IEnumerable<T>>> GetAll();            
+        Task<Result<T>> Create(T entity);                 
+        Task<Result<bool>> Update(T entity);              
+        Task<Result<bool>> Delete(int id);
     }
 
 }

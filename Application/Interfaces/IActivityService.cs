@@ -1,13 +1,14 @@
 ﻿using Biokudi_Backend.Application.DTOs;
+using Biokudi_Backend.Domain.ValueObject;
 
 namespace Biokudi_Backend.Application.Interfaces
 {
     public interface IActivityService
     {
-        Task<List<ActivityDto>?> GetActivities();
-        Task<ActivityDto?> GetActivityById(int id);
-        Task<bool> CreateActivity(ActivityRequestDto department);
-        Task<bool> UpdateActivity(int id, ActivityRequestDto department);
-        Task<bool> DeleteActivity(int id);
+        Task<Result<List<ActivityDto>>> GetActivities();
+        Task<Result<ActivityDto>> GetActivityById(int id);
+        Task<Result<bool>> CreateActivity(ActivityRequestDto activity);
+        Task<Result<bool>> UpdateActivity(int id, ActivityRequestDto activity);
+        Task<Result<bool>> DeleteActivity(int id);
     }
 }

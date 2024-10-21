@@ -7,90 +7,62 @@ namespace Biokudi_Backend.UI.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin, Editor")]
     public class DepartmentController(IDepartmentService _departmentService) : ControllerBase
     {
         private readonly IDepartmentService _departmentService = _departmentService;
 
         [HttpGet]
+        [Authorize(Roles = "Admin, Editor")]
         public async Task<IActionResult> Get()
         {
-            try
-            {
-                var result = await _departmentService.GetDepartments();
-                if (result == null)
-                    return NotFound();
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var result = await _departmentService.GetDepartments();
+            if (result.IsFailure)
+                return BadRequest(result.ErrorMessage);
+            if (result.Value == null || !result.Value.Any())
+                return NotFound();
+            return Ok(result.Value);
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Get(int id)
         {
-            try
-            {
-                var result = await _departmentService.GetDepartmentById(id);
-                if (result == null)
-                    return NotFound();
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var result = await _departmentService.GetDepartmentById(id);
+            if (result.IsFailure)
+                return BadRequest(result.ErrorMessage);
+            if (result.Value == null)
+                return NotFound();
+            return Ok(result.Value);
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Post([FromBody] DepartmentRequestDto department)
         {
-            try
-            {
-                var result = await _departmentService.CreateDepartment(department);
-                if (!result)
-                    return BadRequest();
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var result = await _departmentService.CreateDepartment(department);
+            if (result.IsFailure)
+                return BadRequest(result.ErrorMessage);
+            return Ok();
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Put(int id, [FromBody] DepartmentRequestDto department)
         {
-            try
-            {
-                var result = await _departmentService.UpdateDepartment(id, department);
-                if (!result)
-                    return BadRequest();
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var result = await _departmentService.UpdateDepartment(id, department);
+            if (result.IsFailure)
+                return BadRequest(result.ErrorMessage);
+            return Ok();
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
-            try
-            {
-                var result = await _departmentService.DeleteDepartment(id);
-                if (!result)
-                    return BadRequest();
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var result = await _departmentService.DeleteDepartment(id);
+            if (result.IsFailure)
+                return BadRequest(result.ErrorMessage);
+            return Ok();
         }
     }
-
 }

@@ -1,26 +1,27 @@
 ﻿using Biokudi_Backend.Domain.Entities;
 using Biokudi_Backend.Domain.Interfaces;
+using Biokudi_Backend.Domain.ValueObject;
 
 namespace Biokudi_Backend.Infrastructure.Repositories
 {
     public class TicketRepository : ITicketRepository
     {
-        public Task<TicketEntity>? Create(TicketEntity entity)
+        public Task<Result<TicketEntity>> Create(TicketEntity entity)
         {
             throw new NotImplementedException();
         }
 
-        public Task<bool> Delete(int id)
+        public Task<Result<bool>> Delete(int id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<TicketEntity>?> GetAll()
+        public Task<Result<IEnumerable<TicketEntity>>> GetAll()
         {
             throw new NotImplementedException();
         }
 
-        public Task<TicketEntity>? GetById(int id)
+        public Task<Result<TicketEntity>> GetById(int id)
         {
             throw new NotImplementedException();
         }
@@ -50,7 +51,7 @@ namespace Biokudi_Backend.Infrastructure.Repositories
             throw new NotImplementedException();
         }
 
-        public Task<bool> Update(TicketEntity entity)
+        public Task<Result<bool>> Update(TicketEntity entity)
         {
             throw new NotImplementedException();
         }

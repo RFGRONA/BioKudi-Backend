@@ -2,6 +2,7 @@
 using Biokudi_Backend.Application.Interfaces;
 using Biokudi_Backend.Application.Mappings;
 using Biokudi_Backend.Domain.Interfaces;
+using Biokudi_Backend.Domain.ValueObject;
 
 namespace Biokudi_Backend.Application.Services
 {
@@ -10,71 +11,42 @@ namespace Biokudi_Backend.Application.Services
         private readonly ActivityMapping _activityMapping = activityMapping;
         private readonly IActivityRepository _activityRepository = activityRepository;
 
-        public async Task<bool> CreateActivity(ActivityRequestDto activity)
+        public async Task<Result<bool>> CreateActivity(ActivityRequestDto activity)
         {
-            try
-            {
-                var result = await _activityRepository.Create(_activityMapping.RequestToEntity(activity));
-                return result != null;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            var result = await _activityRepository.Create(_activityMapping.RequestToEntity(activity));
+            return result.IsSuccess
+                ? Result<bool>.Success(true)
+                : Result<bool>.Failure(result.ErrorMessage);
         }
 
-        public async Task<bool> DeleteActivity(int id)
+        public async Task<Result<bool>> DeleteActivity(int id)
         {
-            try
-            {
-                var result = await _activityRepository.Delete(id);
-                return result;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            var result = await _activityRepository.Delete(id);
+            return result;
         }
 
-        public async Task<List<ActivityDto>?> GetActivities()
+        public async Task<Result<List<ActivityDto>>> GetActivities()
         {
-            try
-            {
-                var result = await _activityRepository.GetAll();
-                return result?.Select(a => _activityMapping.EntityToDto(a)).ToList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            var result = await _activityRepository.GetAll();
+            return result.IsSuccess
+                ? Result<List<ActivityDto>>.Success(result.Value.Select(a => _activityMapping.EntityToDto(a)).ToList())
+                : Result<List<ActivityDto>>.Failure(result.ErrorMessage);
         }
 
-        public async Task<ActivityDto?> GetActivityById(int id)
+        public async Task<Result<ActivityDto>> GetActivityById(int id)
         {
-            try
-            {
-                var result = await _activityRepository.GetById(id);
-                return _activityMapping.EntityToDto(result);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            var result = await _activityRepository.GetById(id);
+            return result.IsSuccess
+                ? Result<ActivityDto>.Success(_activityMapping.EntityToDto(result.Value))
+                : Result<ActivityDto>.Failure(result.ErrorMessage);
         }
 
-        public async Task<bool> UpdateActivity(int id, ActivityRequestDto activity)
+        public async Task<Result<bool>> UpdateActivity(int id, ActivityRequestDto activity)
         {
-            try
-            {
-                var entity = _activityMapping.RequestToEntity(activity);
-                entity.IdActivity = id;
-                var result = await _activityRepository.Update(entity);
-                return result;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            var entity = _activityMapping.RequestToEntity(activity);
+            entity.IdActivity = id;
+            var result = await _activityRepository.Update(entity);
+            return result;
         }
     }
 }
