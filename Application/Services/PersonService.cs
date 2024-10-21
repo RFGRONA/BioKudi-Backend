@@ -4,6 +4,8 @@ using Biokudi_Backend.Application.Interfaces;
 using Biokudi_Backend.Application.Mappings;
 using Biokudi_Backend.Application.Utilities;
 using Biokudi_Backend.Domain.Interfaces;
+using Biokudi_Backend.Domain.ValueObject;
+using Biokudi_Backend.Infrastructure.Repositories;
 
 namespace Biokudi_Backend.Application.Services
 {
@@ -13,68 +15,93 @@ namespace Biokudi_Backend.Application.Services
         private readonly EmailUtility _emailUtility = emailUtility;
         private readonly RSAUtility _rsaUtility = _rsaUtility;
 
-        public async Task<LoginResponseDto>? GetPersonById(int id)
+        public async Task<Result<LoginResponseDto>> GetPersonById(int id)
         {
-            try
-            {
-                var result = await _personRepository.GetById(id);
-                return PersonMapping.PersonEntityToLoginDto(result);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            var result = await _personRepository.GetById(id);
+            if (result.IsSuccess)
+                return Result<LoginResponseDto>.Success(PersonMapping.PersonEntityToLoginDto(result.Value));
+            return Result<LoginResponseDto>.Failure(result.ErrorMessage);
         }
 
-        public async Task<ProfileResponseDto>? GetUserProfile(int id)
+        public async Task<Result<ProfileResponseDto>> GetUserProfile(int id)
         {
-            try
-            {
-                var result = await _personRepository.GetById(id);
-                return PersonMapping.PersonToProfile(result);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            var result = await _personRepository.GetById(id);
+            return result.IsSuccess
+                ? Result<ProfileResponseDto>.Success(PersonMapping.PersonToProfile(result.Value))
+                : Result<ProfileResponseDto>.Failure(result.ErrorMessage);
         }
 
-        public async Task<LoginResponseDto?> LoginPerson(LoginRequestDto loginDto)
+        public async Task<Result<List<PersonListCrudDto>>> GetUsers()
         {
-            try
-            {
-                if (!EmailValidatorUtility.ValidateEmailAsync(loginDto.Email).Result)
-                    throw new KeyNotFoundException("Correo invalido");
-                var personEntity = PersonMapping.LoginToPersonEntity(loginDto);
-                var result = await _personRepository.GetAccountByEmail(personEntity.Email);
-                loginDto.Password = _rsaUtility.DecryptWithPrivateKey(loginDto.Password);
-                if (!PasswordUtility.VerifyPassword(loginDto.Password, result.Password))
-                    throw new KeyNotFoundException($"Contraseña incorrecta");
-                return PersonMapping.PersonEntityToLoginDto(result);
-            } 
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            var result = await _personRepository.GetAll();
+            return result.IsSuccess
+                ? Result<List<PersonListCrudDto>>.Success(PersonMapping.MapToPersonList(result.Value).OrderBy(p => p.IdUser).ToList())
+                : Result<List<PersonListCrudDto>>.Failure(result.ErrorMessage);
         }
 
-        public async Task<RegisterRequestDto?> RegisterPerson(RegisterRequestDto registerDto)
+        public async Task<Result<LoginResponseDto>> LoginPerson(LoginRequestDto loginDto)
         {
-            try
-            {
-                if (!EmailValidatorUtility.ValidateEmailAsync(registerDto.Email).Result)
-                    throw new KeyNotFoundException("Correo invalido");
-                var personEntity = PersonMapping.RegisterToPersonEntity(registerDto);
-                personEntity.Password = _rsaUtility.DecryptWithPrivateKey(personEntity.Password);
-                personEntity.Password = PasswordUtility.HashPassword(personEntity.Password);
-                var result = await _personRepository.Create(personEntity);
-                _emailUtility.SendEmail(result.Email, "Registro exitoso", _emailUtility.CreateAccountAlert(result.NameUser));
-                return registerDto;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            if (!EmailValidatorUtility.ValidateEmailAsync(loginDto.Email).Result)
+                return Result<LoginResponseDto>.Failure("Correo inválido");
+
+            var personEntity = PersonMapping.LoginToPersonEntity(loginDto);
+            var result = await _personRepository.GetAccountByEmail(personEntity.Email);
+
+            if (!result.IsSuccess)
+                return Result<LoginResponseDto>.Failure(result.ErrorMessage);
+
+            loginDto.Password = _rsaUtility.DecryptWithPrivateKey(loginDto.Password);
+            if (!PasswordUtility.VerifyPassword(loginDto.Password, result.Value.Password))
+                return Result<LoginResponseDto>.Failure("Contraseña incorrecta.");
+
+            return Result<LoginResponseDto>.Success(PersonMapping.PersonEntityToLoginDto(result.Value));
+        }
+
+        public async Task<Result<RegisterRequestDto>> RegisterPerson(RegisterRequestDto registerDto)
+        {
+            if (!EmailValidatorUtility.ValidateEmailAsync(registerDto.Email).Result)
+                return Result<RegisterRequestDto>.Failure("Correo inválido");
+
+            var personEntity = PersonMapping.RegisterToPersonEntity(registerDto);
+            personEntity.Password = _rsaUtility.DecryptWithPrivateKey(personEntity.Password);
+            personEntity.Password = PasswordUtility.HashPassword(personEntity.Password);
+
+            var result = await _personRepository.Create(personEntity);
+            if (!result.IsSuccess)
+                return Result<RegisterRequestDto>.Failure(result.ErrorMessage);
+
+            _emailUtility.SendEmail(result.Value.Email, "Registro exitoso", _emailUtility.CreateAccountAlert(result.Value.NameUser));
+            return Result<RegisterRequestDto>.Success(registerDto);
+        }
+
+        public async Task<Result<bool>> DeleteUser(int id)
+        {
+            var result = await _personRepository.Delete(id);
+            return result.IsSuccess ? Result<bool>.Success(true) : Result<bool>.Failure(result.ErrorMessage);
+        }
+
+        public async Task<Result<bool>> UpdateCrudUser(int id, PersonCrudRequestDto person)
+        {
+            var personEntity = PersonMapping.PersonCrudRequestToEntity(person);
+            personEntity.IdUser = id;
+            var result = await _personRepository.Update(personEntity);
+            return result.IsSuccess ? Result<bool>.Success(true) : Result<bool>.Failure(result.ErrorMessage);
+        }
+
+        public async Task<Result<bool>> UpdateUserProfile(int id, PersonRequestDto person)
+        {
+            var personEntity = PersonMapping.PersonRequestToEntity(person);
+            personEntity.IdUser = id;
+            var result = await _personRepository.Update(personEntity);
+            return result.IsSuccess ? Result<bool>.Success(true) : Result<bool>.Failure(result.ErrorMessage);
+        }
+
+        public async Task<Result<PersonCrudResponseDto>> GetCrudPersonById(int id)
+        {
+            var result = await _personRepository.GetById(id);
+            return result.IsSuccess
+                ? Result<PersonCrudResponseDto>.Success(PersonMapping.EntityToPersonCrudResponse(result.Value))
+                : Result<PersonCrudResponseDto>.Failure(result.ErrorMessage);
         }
     }
 }
