@@ -9,17 +9,18 @@ using Biokudi_Backend.Infrastructure.Repositories;
 
 namespace Biokudi_Backend.Application.Services
 {
-    public class PersonService(IPersonRepository personRepository, EmailUtility emailUtility, RSAUtility _rsaUtility) : IPersonService
+    public class PersonService(IPersonRepository personRepository, EmailUtility emailUtility, RSAUtility rsaUtility, PersonMapping personMapping) : IPersonService
     {
         private readonly IPersonRepository _personRepository = personRepository;
         private readonly EmailUtility _emailUtility = emailUtility;
-        private readonly RSAUtility _rsaUtility = _rsaUtility;
+        private readonly RSAUtility _rsaUtility = rsaUtility;
+        private readonly PersonMapping _personMapping = personMapping;
 
         public async Task<Result<LoginResponseDto>> GetPersonById(int id)
         {
             var result = await _personRepository.GetById(id);
             if (result.IsSuccess)
-                return Result<LoginResponseDto>.Success(PersonMapping.PersonEntityToLoginDto(result.Value));
+                return Result<LoginResponseDto>.Success(_personMapping.PersonEntityToLoginDto(result.Value));
             return Result<LoginResponseDto>.Failure(result.ErrorMessage);
         }
 
@@ -27,7 +28,7 @@ namespace Biokudi_Backend.Application.Services
         {
             var result = await _personRepository.GetById(id);
             return result.IsSuccess
-                ? Result<ProfileResponseDto>.Success(PersonMapping.PersonToProfile(result.Value))
+                ? Result<ProfileResponseDto>.Success(_personMapping.PersonToProfile(result.Value))
                 : Result<ProfileResponseDto>.Failure(result.ErrorMessage);
         }
 
@@ -35,7 +36,7 @@ namespace Biokudi_Backend.Application.Services
         {
             var result = await _personRepository.GetAll();
             return result.IsSuccess
-                ? Result<List<PersonListCrudDto>>.Success(PersonMapping.MapToPersonList(result.Value).OrderBy(p => p.IdUser).ToList())
+                ? Result<List<PersonListCrudDto>>.Success(_personMapping.MapToPersonList(result.Value).OrderBy(p => p.IdUser).ToList())
                 : Result<List<PersonListCrudDto>>.Failure(result.ErrorMessage);
         }
 
@@ -44,7 +45,7 @@ namespace Biokudi_Backend.Application.Services
             if (!EmailValidatorUtility.ValidateEmailAsync(loginDto.Email).Result)
                 return Result<LoginResponseDto>.Failure("Correo inválido");
 
-            var personEntity = PersonMapping.LoginToPersonEntity(loginDto);
+            var personEntity = _personMapping.LoginToPersonEntity(loginDto);
             var result = await _personRepository.GetAccountByEmail(personEntity.Email);
 
             if (!result.IsSuccess)
@@ -54,7 +55,7 @@ namespace Biokudi_Backend.Application.Services
             if (!PasswordUtility.VerifyPassword(loginDto.Password, result.Value.Password))
                 return Result<LoginResponseDto>.Failure("Contraseña incorrecta.");
 
-            return Result<LoginResponseDto>.Success(PersonMapping.PersonEntityToLoginDto(result.Value));
+            return Result<LoginResponseDto>.Success(_personMapping.PersonEntityToLoginDto(result.Value));
         }
 
         public async Task<Result<RegisterRequestDto>> RegisterPerson(RegisterRequestDto registerDto)
@@ -62,7 +63,7 @@ namespace Biokudi_Backend.Application.Services
             if (!EmailValidatorUtility.ValidateEmailAsync(registerDto.Email).Result)
                 return Result<RegisterRequestDto>.Failure("Correo inválido");
 
-            var personEntity = PersonMapping.RegisterToPersonEntity(registerDto);
+            var personEntity = _personMapping.RegisterToPersonEntity(registerDto);
             personEntity.Password = _rsaUtility.DecryptWithPrivateKey(personEntity.Password);
             personEntity.Password = PasswordUtility.HashPassword(personEntity.Password);
 
@@ -82,7 +83,7 @@ namespace Biokudi_Backend.Application.Services
 
         public async Task<Result<bool>> UpdateCrudUser(int id, PersonCrudRequestDto person)
         {
-            var personEntity = PersonMapping.PersonCrudRequestToEntity(person);
+            var personEntity = _personMapping.PersonCrudRequestToEntity(person);
             personEntity.IdUser = id;
             var result = await _personRepository.Update(personEntity);
             return result.IsSuccess ? Result<bool>.Success(true) : Result<bool>.Failure(result.ErrorMessage);
@@ -90,7 +91,7 @@ namespace Biokudi_Backend.Application.Services
 
         public async Task<Result<bool>> UpdateUserProfile(int id, PersonRequestDto person)
         {
-            var personEntity = PersonMapping.PersonRequestToEntity(person);
+            var personEntity = _personMapping.PersonRequestToEntity(person);
             personEntity.IdUser = id;
             var result = await _personRepository.Update(personEntity);
             return result.IsSuccess ? Result<bool>.Success(true) : Result<bool>.Failure(result.ErrorMessage);
@@ -100,7 +101,7 @@ namespace Biokudi_Backend.Application.Services
         {
             var result = await _personRepository.GetById(id);
             return result.IsSuccess
-                ? Result<PersonCrudResponseDto>.Success(PersonMapping.EntityToPersonCrudResponse(result.Value))
+                ? Result<PersonCrudResponseDto>.Success(_personMapping.EntityToPersonCrudResponse(result.Value))
                 : Result<PersonCrudResponseDto>.Failure(result.ErrorMessage);
         }
     }

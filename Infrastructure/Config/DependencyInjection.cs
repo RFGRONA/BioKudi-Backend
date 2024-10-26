@@ -8,7 +8,7 @@ using Biokudi_Backend.Infrastructure.Services;
 
 namespace Biokudi_Backend.Infrastructure.Config
 {
-    public class DependencyInjection
+    public static class DependencyInjection
     {
         public static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
@@ -17,6 +17,7 @@ namespace Biokudi_Backend.Infrastructure.Config
             services.AddScoped<CookiesService>();
             services.AddSingleton<AuthService>();
             services.AddScoped<ICacheService, CacheService>();
+            services.AddSingleton<SanitizerService>();
 
             services.AddScoped<IPersonRepository, PersonRepository>();
             services.AddScoped<IPlaceRepository, PlaceRepository>();

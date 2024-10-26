@@ -1,8 +1,6 @@
 ﻿using Biokudi_Backend.Application.DTOs.Request;
 using Biokudi_Backend.Application.DTOs.Response;
 using Biokudi_Backend.Domain.Entities;
-using Biokudi_Backend.Infrastructure;
-using static System.Net.WebRequestMethods;
 
 namespace Biokudi_Backend.Application.Mappings
 {
@@ -21,7 +19,7 @@ namespace Biokudi_Backend.Application.Mappings
             "https://i.postimg.cc/c1FhsWZq/Profile-PNG-Photo.png"
         };
 
-        public static PersonEntity LoginToPersonEntity(LoginRequestDto loginDto)
+        public PersonEntity LoginToPersonEntity(LoginRequestDto loginDto)
         {
             return new PersonEntity
             {
@@ -30,7 +28,7 @@ namespace Biokudi_Backend.Application.Mappings
             };
         }
 
-        public static LoginResponseDto PersonEntityToLoginDto(PersonEntity personEntity)
+        public LoginResponseDto PersonEntityToLoginDto(PersonEntity personEntity)
         {
             return new LoginResponseDto
             {
@@ -43,7 +41,7 @@ namespace Biokudi_Backend.Application.Mappings
             };
         }
 
-        public static PersonEntity RegisterToPersonEntity(RegisterRequestDto registerDto)
+        public PersonEntity RegisterToPersonEntity(RegisterRequestDto registerDto)
         {
             return new PersonEntity
             {
@@ -53,7 +51,7 @@ namespace Biokudi_Backend.Application.Mappings
             };
         }
 
-        public static ProfileResponseDto PersonToProfile(PersonEntity person)
+        public ProfileResponseDto PersonToProfile(PersonEntity person)
         {
             return new ProfileResponseDto
             {
@@ -67,7 +65,7 @@ namespace Biokudi_Backend.Application.Mappings
             };
         }
 
-        public static List<PersonListCrudDto> MapToPersonList(IEnumerable<PersonEntity> persons)
+        public List<PersonListCrudDto> MapToPersonList(IEnumerable<PersonEntity> persons)
         {
             return persons.Select(person => new PersonListCrudDto
             {
@@ -79,7 +77,7 @@ namespace Biokudi_Backend.Application.Mappings
             }).ToList();
         }
 
-        public static PersonEntity PersonCrudRequestToEntity(PersonCrudRequestDto person)
+        public PersonEntity PersonCrudRequestToEntity(PersonCrudRequestDto person)
         {
             return new PersonEntity
             {
@@ -87,7 +85,7 @@ namespace Biokudi_Backend.Application.Mappings
             };
         }
 
-        public static PersonEntity PersonRequestToEntity(PersonRequestDto person)
+        public PersonEntity PersonRequestToEntity(PersonRequestDto person)
         {
             return new PersonEntity
             {
@@ -99,7 +97,7 @@ namespace Biokudi_Backend.Application.Mappings
             };
         }
 
-        public static PersonCrudResponseDto EntityToPersonCrudResponse(PersonEntity person)
+        public PersonCrudResponseDto EntityToPersonCrudResponse(PersonEntity person)
         {
             return new PersonCrudResponseDto
             {
