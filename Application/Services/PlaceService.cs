@@ -78,6 +78,16 @@ namespace Biokudi_Backend.Application.Services
             return Result<PlaceDetailResponseDto>.Failure(result.ErrorMessage);
         }
 
+        public async Task<Result<PlaceMapDetailResponseDto>> GetMapPlaceById(int id)
+        {
+            var result = await _placeRepository.GetById(id);
+            if (result.IsSuccess)
+            {
+                return Result<PlaceMapDetailResponseDto>.Success(_placeMapping.ToPlaceMapDetailResponseDto(result.Value));
+            }
+            return Result<PlaceMapDetailResponseDto>.Failure(result.ErrorMessage);
+        }
+
         public async Task<Result<List<StartCarrouselDto>>> GetStartCarrousel()
         {
             var result = await _placeRepository.GetAll();

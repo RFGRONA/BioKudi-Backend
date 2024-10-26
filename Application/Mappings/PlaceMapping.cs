@@ -71,6 +71,49 @@ namespace Biokudi_Backend.Application.Mappings
             };
         }
 
+        public PlaceMapDetailResponseDto ToPlaceMapDetailResponseDto(PlaceEntity place)
+        {
+            return new PlaceMapDetailResponseDto
+            {
+                IdPlace = place.IdPlace,
+                NamePlace = place.NamePlace,
+                Link = place.Link,
+                Address = place.Address,
+                DateCreated = place.DateCreated,
+                DateModified = place.DateModified,
+                Latitude = place.Latitude,
+                Longitude = place.Longitude,
+                Description = place.Description,
+                City = place.City,
+                State = place.State,
+                Activities = place.Activities.Select(a => new ActivityDto
+                {
+                    IdActivity = a.IdActivity,
+                    NameActivity = a.NameActivity,
+                    UrlIcon = a.UrlIcon ?? string.Empty
+                }).ToList(),
+                Pictures = place.Pictures.Select(p => new PictureResponseDto
+                {
+                    IdPicture = p.IdPicture,
+                    Url = p.Link,
+                    Name = p.Name
+                }).ToList(),
+                Reviews = place.Reviews
+                    .OrderByDescending(r => r.DateCreated)
+                    .Take(3)
+                    .Select(r => new ReviewMapResponseDto
+                    {
+                        IdReview = r.IdReview,
+                        Comment = r.Comment,
+                        Rate = r.Rate,
+                        DateCreated = r.DateCreated.ToString("yyyy-MM-dd"),
+                        DateModified = r.DateModified?.ToString("yyyy-MM-dd") ?? string.Empty,
+                        PersonName = r.Person?.NameUser ?? "Anonymous"
+                    }).ToList(),
+            };
+        }
+
+
         public PlaceEntity RequestToPlaceEntity(PlaceRequestDto place)
         {
             return new PlaceEntity
@@ -127,6 +170,10 @@ namespace Biokudi_Backend.Application.Mappings
             {
                 IdPlace = place.IdPlace,
                 NamePlace = place.NamePlace,
+                Description = place.Description,
+                Address = place.Address,
+                Link = place.Link,
+                Rating = place.Rating,
                 Latitude = place.Latitude,
                 Longitude = place.Longitude
             };

@@ -7,7 +7,7 @@ namespace Biokudi_Backend.Application.Mappings
 {
     public class ReviewMapping
     {
-        public static ReviewEntity ToEntity(CreateReviewRequestDto dto)
+        public ReviewEntity ToEntity(CreateReviewRequestDto dto)
         {
             return new ReviewEntity
             {
@@ -18,7 +18,7 @@ namespace Biokudi_Backend.Application.Mappings
             };
         }
 
-        public static ReviewEntity ToEntity(UpdateReviewRequestDto dto)
+        public ReviewEntity ToEntity(UpdateReviewRequestDto dto)
         {
             return new ReviewEntity
             {
@@ -27,7 +27,7 @@ namespace Biokudi_Backend.Application.Mappings
             };
         }
 
-        public static ReviewResponseDto ToDto(ReviewEntity entity)
+        public ReviewResponseDto ToDto(ReviewEntity entity)
         {
             return new ReviewResponseDto
             {
@@ -42,6 +42,18 @@ namespace Biokudi_Backend.Application.Mappings
                 PlaceName = entity.Place.NamePlace 
             };
         }
-    }
 
+        public ReviewMapResponseDto ToReviewMapDto(ReviewEntity entity)
+        {
+            return new ReviewMapResponseDto
+            {
+                IdReview = entity.IdReview,
+                Rate = entity.Rate,
+                Comment = entity.Comment,
+                DateCreated = entity.DateCreated.ToString("yyyy-MM-dd"),
+                DateModified = entity.DateModified?.ToString("yyyy-MM-dd") ?? string.Empty,
+                PersonName = entity.Person.NameUser
+            };
+        }
+    }
 }

@@ -6,11 +6,11 @@ namespace Biokudi_Backend.Application.Interfaces
 {
     public interface IReviewService
     {
-        Task<Result<ReviewResponseDto>> CreateReviewAsync(CreateReviewRequestDto dto);
-        Task<Result<bool>> UpdateReviewAsync(int id, UpdateReviewRequestDto dto);
-        Task<Result<bool>> DeleteReviewAsync(int id);
-        Task<Result<ReviewResponseDto>> GetReviewByIdAsync(int id);
-        Task<Result<IEnumerable<ReviewResponseDto>>> GetAllReviewsAsync();
-        Task<Result<IEnumerable<ReviewResponseDto>>> GetReviewsByPlaceIdAsync(int placeId);
+        Task<Result<ReviewResponseDto>> CreateReview(CreateReviewRequestDto dto);
+        Task<Result<bool>> UpdateReview(int id, UpdateReviewRequestDto dto);
+        Task<Result<bool>> DeleteReview(int id);
+        Task<Result<ReviewResponseDto>> GetReviewById(int id);
+        Task<Result<IEnumerable<ReviewResponseDto>>> GetAllReviews();
+        Task<Result<IEnumerable<ReviewMapResponseDto>>> GetReviewsByPlaceId(int placeId);
     }
 }

@@ -10,6 +10,7 @@ namespace Biokudi_Backend.Application.Interfaces
         Task<Result<List<PlaceListActivityDto>>> GetListActivities();
         Task<Result<List<PlaceListPointMapDto>>> GetListPointMap();
         Task<Result<PlaceDetailResponseDto>> GetPlaceById(int id);
+        Task<Result<PlaceMapDetailResponseDto>> GetMapPlaceById(int id);
         Task<Result<List<PlaceListCrudDto>>> GetCrudPlaces();
         Task<Result<bool>> CreatePlace(PlaceRequestDto place);
         Task<Result<bool>> UpdatePlace(int id, PlaceRequestDto place);
