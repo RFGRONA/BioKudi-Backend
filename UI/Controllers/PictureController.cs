@@ -1,4 +1,5 @@
-﻿using Biokudi_Backend.Application.Interfaces;
+﻿using Biokudi_Backend.Application.DTOs.Response;
+using Biokudi_Backend.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,6 +13,7 @@ namespace Biokudi_Backend.UI.Controllers
         private readonly IPictureService _pictureService = pictureService;
 
         [HttpGet]
+        [ProducesResponseType(typeof(List<PictureResponseDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> Get()
         {
             var result = await _pictureService.GetPictures();

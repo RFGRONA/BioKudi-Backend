@@ -1,4 +1,5 @@
 ﻿using Biokudi_Backend.Application.DTOs;
+using Biokudi_Backend.Application.DTOs.Response;
 using Biokudi_Backend.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +15,7 @@ namespace Biokudi_Backend.UI.Controllers
         private readonly IRoleService _roleService = roleService;
 
         [HttpGet]
+        [ProducesResponseType(typeof(List<RoleDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> Get()
         {
             var result = await _roleService.GetRole();
@@ -27,6 +29,7 @@ namespace Biokudi_Backend.UI.Controllers
         }
 
         [HttpGet("{id}")]
+        [ProducesResponseType(typeof(RoleDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> Get(int id)
         {
             var result = await _roleService.GetRoleById(id);

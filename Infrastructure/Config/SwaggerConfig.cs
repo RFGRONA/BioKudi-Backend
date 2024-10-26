@@ -1,4 +1,5 @@
-﻿using Microsoft.OpenApi.Models;
+﻿using Biokudi_Backend.Infrastructure.Services;
+using Microsoft.OpenApi.Models;
 
 namespace Biokudi_Backend.Infrastructure.Config
 {
@@ -15,7 +16,6 @@ namespace Biokudi_Backend.Infrastructure.Config
                     Description = "Gestión y validación de datos."
                 });
 
-                // Configuración de seguridad para JWT
                 options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Description = "JWT Token usar Bearer {token}",
@@ -42,6 +42,11 @@ namespace Biokudi_Backend.Infrastructure.Config
                         new List<string>()
                     }
                 });
+
+                options.OperationFilter<ProducesResponseTypeFilter>();
+                options.OperationFilter<UnauthorizedResponseFilter>();
+                options.OperationFilter<ProducesJsonFilter>();
+
             });
         }
     }

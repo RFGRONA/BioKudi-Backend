@@ -14,33 +14,28 @@ namespace Biokudi_Backend.UI.Controllers
 
         [HttpGet]
         [Authorize(Roles = "Admin, Editor")]
+        [ProducesResponseType(typeof(List<ReviewResponseDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllReviews()
         {
-            var result = await _reviewService.GetAllReviewsAsync();
-            return result.IsSuccess ? Ok(result.Value) : NotFound(result.ErrorMessage);
-        }
-
-        [HttpGet]
-        [Route("ByPlace/{placeId}")]
-        public async Task<IActionResult> GetReviewsByPlace(int placeId)
-        {
-            var result = await _reviewService.GetReviewsByPlaceIdAsync(placeId);
+            var result = await _reviewService.GetAllReviews();
             return result.IsSuccess ? Ok(result.Value) : NotFound(result.ErrorMessage);
         }
 
         [HttpGet("{id}")]
         [Authorize]
+        [ProducesResponseType(typeof(ReviewResponseDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetReviewById(int id)
         {
-            var result = await _reviewService.GetReviewByIdAsync(id);
+            var result = await _reviewService.GetReviewById(id);
             return result.IsSuccess ? Ok(result.Value) : NotFound(result.ErrorMessage);
         }
 
         [HttpPost]
         [Authorize]
+        [ProducesResponseType(typeof(ReviewResponseDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> CreateReview([FromBody] CreateReviewRequestDto review)
         {
-            var result = await _reviewService.CreateReviewAsync(review);
+            var result = await _reviewService.CreateReview(review);
             return result.IsSuccess ? Ok(result.Value) : BadRequest(result.ErrorMessage);
         }
 
@@ -48,7 +43,7 @@ namespace Biokudi_Backend.UI.Controllers
         [Authorize]
         public async Task<IActionResult> UpdateReview(int id, [FromBody] UpdateReviewRequestDto review)
         {
-            var result = await _reviewService.UpdateReviewAsync(id, review);
+            var result = await _reviewService.UpdateReview(id, review);
             return result.IsSuccess ? Ok() : BadRequest(result.ErrorMessage);
         }
 
@@ -56,7 +51,7 @@ namespace Biokudi_Backend.UI.Controllers
         [Authorize]
         public async Task<IActionResult> DeleteReview(int id)
         {
-            var result = await _reviewService.DeleteReviewAsync(id);
+            var result = await _reviewService.DeleteReview(id);
             return result.IsSuccess ? Ok() : BadRequest(result.ErrorMessage);
         }
     }

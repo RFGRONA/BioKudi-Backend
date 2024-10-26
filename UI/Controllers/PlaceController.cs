@@ -1,8 +1,9 @@
-﻿using Biokudi_Backend.Application.DTOs;
-using Biokudi_Backend.Application.DTOs.Request;
+﻿using Biokudi_Backend.Application.DTOs.Request;
+using Biokudi_Backend.Application.DTOs.Response;
 using Biokudi_Backend.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 
 namespace Biokudi_Backend.UI.Controllers
 {
@@ -14,6 +15,8 @@ namespace Biokudi_Backend.UI.Controllers
 
         [HttpGet]
         [Route("GetStartCarrousel")]
+        [OutputCache(Duration = 300)]
+        [ProducesResponseType(typeof(List<StartCarrouselDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetStartCarrousel()
         {
             var result = await _placeService.GetStartCarrousel();
@@ -22,22 +25,17 @@ namespace Biokudi_Backend.UI.Controllers
 
         [HttpGet]
         [Route("GetListActivities")]
+        [OutputCache(Duration = 300)]
+        [ProducesResponseType(typeof(List<PlaceListActivityDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetListActivities()
         {
             var result = await _placeService.GetListActivities();
             return result.IsSuccess ? Ok(result.Value) : NotFound(result.ErrorMessage);
         }
 
-        [HttpGet]
-        [Route("GetListPointMap")]
-        public async Task<IActionResult> GetListPointMap()
-        {
-            var result = await _placeService.GetListPointMap();
-            return result.IsSuccess ? Ok(result.Value) : NotFound(result.ErrorMessage);
-        }
-
         [HttpGet("{id}")]
         [Authorize(Roles = "Admin, Editor")]
+        [ProducesResponseType(typeof(PlaceDetailResponseDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetPlaceById(int id)
         {
             var result = await _placeService.GetPlaceById(id);
@@ -46,6 +44,7 @@ namespace Biokudi_Backend.UI.Controllers
 
         [HttpGet]
         [Authorize(Roles = "Admin, Editor")]
+        [ProducesResponseType(typeof(List<PlaceListCrudDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetPlaces()
         {
             var result = await _placeService.GetCrudPlaces();

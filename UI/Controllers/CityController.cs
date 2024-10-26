@@ -1,4 +1,5 @@
 ﻿using Biokudi_Backend.Application.DTOs;
+using Biokudi_Backend.Application.DTOs.Response;
 using Biokudi_Backend.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +14,7 @@ namespace Biokudi_Backend.UI.Controllers
 
         [HttpGet]
         [Authorize(Roles = "Admin, Editor")]
+        [ProducesResponseType(typeof(List<CityDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> Get()
         {
             var result = await _cityService.GetCities();
@@ -25,6 +27,7 @@ namespace Biokudi_Backend.UI.Controllers
 
         [HttpGet("{id}")]
         [Authorize(Roles = "Admin")]
+        [ProducesResponseType(typeof(CityDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> Get(int id)
         {
             var result = await _cityService.GetCityById(id);

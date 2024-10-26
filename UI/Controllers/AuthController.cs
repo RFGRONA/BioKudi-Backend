@@ -1,5 +1,6 @@
 ﻿using Biokudi_Backend.Application.DTOs;
 using Biokudi_Backend.Application.DTOs.Request;
+using Biokudi_Backend.Application.DTOs.Response;
 using Biokudi_Backend.Application.Interfaces;
 using Biokudi_Backend.Application.Services;
 using Biokudi_Backend.Application.Utilities;
@@ -7,6 +8,7 @@ using Biokudi_Backend.Infrastructure.Services;
 using Biokudi_Backend.UI.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using System.Security.Claims;
 
 namespace Biokudi_Backend.UI.Controllers
@@ -42,6 +44,7 @@ namespace Biokudi_Backend.UI.Controllers
         }
 
         [HttpPost("login")]
+        [ProducesResponseType(typeof(LoginResponseDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> LoginPerson([FromBody] LoginRequestDto request)
         {
             if (!ModelState.IsValid)
@@ -62,102 +65,76 @@ namespace Biokudi_Backend.UI.Controllers
 
         [HttpGet("check-session")]
         [Authorize]
+        [ProducesResponseType(typeof(LoginResponseDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> CheckSession()
         {
-            try
-            {
-                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (string.IsNullOrEmpty(userId) || !int.TryParse(userId, out int parsedUserId))
-                    return BadRequest(AuthMessages.InvalidSession);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId) || !int.TryParse(userId, out int parsedUserId))
+                return BadRequest(AuthMessages.InvalidSession);
 
-                var result = await _personService.GetPersonById(parsedUserId);
+            var result = await _personService.GetPersonById(parsedUserId);
 
-                if (result.IsFailure)
-                    return BadRequest(result.ErrorMessage);
-                if (result.Value == null)
-                    return NotFound(AuthMessages.PersonNotFound);
+            if (result.IsFailure)
+                return BadRequest(result.ErrorMessage);
+            if (result.Value == null)
+                return NotFound(AuthMessages.PersonNotFound);
 
-                return Ok(result.Value);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            return Ok(result.Value);
         }
 
         [HttpGet("profile")]
         [Authorize]
+        [ProducesResponseType(typeof(ProfileResponseDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> Profile()
         {
-            try
-            {
-                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (string.IsNullOrEmpty(userId) || !int.TryParse(userId, out int parsedUserId))
-                    return BadRequest(AuthMessages.InvalidSession);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId) || !int.TryParse(userId, out int parsedUserId))
+                return BadRequest(AuthMessages.InvalidSession);
 
-                var result = await _personService.GetUserProfile(parsedUserId);
+            var result = await _personService.GetUserProfile(parsedUserId);
 
-                if (result.IsFailure)
-                    return BadRequest(result.ErrorMessage);
-                if (result.Value == null)
-                    return NotFound(AuthMessages.PersonNotFound);
+            if (result.IsFailure)
+                return BadRequest(result.ErrorMessage);
+            if (result.Value == null)
+                return NotFound(AuthMessages.PersonNotFound);
 
-                return Ok(result.Value);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            return Ok(result.Value);
         }
 
         [HttpPut("update-profile")]
         [Authorize]
         public async Task<IActionResult> UpdateProfile([FromBody] PersonRequestDto person)
         {
-            try
-            {
-                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (string.IsNullOrEmpty(userId) || !int.TryParse(userId, out int parsedUserId))
-                    return BadRequest(AuthMessages.InvalidSession);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId) || !int.TryParse(userId, out int parsedUserId))
+                return BadRequest(AuthMessages.InvalidSession);
 
-                var result = await _personService.UpdateUserProfile(parsedUserId, person);
+            var result = await _personService.UpdateUserProfile(parsedUserId, person);
 
-                if (result.IsFailure)
-                    return BadRequest(result.ErrorMessage);
-                if (!result.Value)
-                    return NotFound(AuthMessages.PersonNotFound);
+            if (result.IsFailure)
+                return BadRequest(result.ErrorMessage);
+            if (!result.Value)
+                return NotFound(AuthMessages.PersonNotFound);
 
-                return Ok(result.Value);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            return Ok();
         }
 
         [HttpDelete("delete-profile")]
         [Authorize]
         public async Task<IActionResult> Delete()
         {
-            try
-            {
-                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (string.IsNullOrEmpty(userId) || !int.TryParse(userId, out int parsedUserId))
-                    return BadRequest(AuthMessages.InvalidSession);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId) || !int.TryParse(userId, out int parsedUserId))
+                return BadRequest(AuthMessages.InvalidSession);
 
-                var result = await _personService.DeleteUser(parsedUserId);
+            var result = await _personService.DeleteUser(parsedUserId);
 
-                if (result.IsFailure)
-                    return BadRequest(result.ErrorMessage);
-                if (!result.Value)
-                    return NotFound(AuthMessages.PersonNotFound);
+            if (result.IsFailure)
+                return BadRequest(result.ErrorMessage);
+            if (!result.Value)
+                return NotFound(AuthMessages.PersonNotFound);
 
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            return Ok();
         }
 
         [HttpPost("logout")]
@@ -169,6 +146,7 @@ namespace Biokudi_Backend.UI.Controllers
         }
 
         [HttpGet("public-key")]
+        [OutputCache(Duration = 300)]
         public ActionResult GetPublicKey()
         {
             try

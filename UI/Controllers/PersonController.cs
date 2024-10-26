@@ -1,5 +1,6 @@
 ﻿using Biokudi_Backend.Application.DTOs;
 using Biokudi_Backend.Application.DTOs.Request;
+using Biokudi_Backend.Application.DTOs.Response;
 using Biokudi_Backend.Application.Interfaces;
 using Biokudi_Backend.UI.Helpers;
 using Microsoft.AspNetCore.Authorization;
@@ -16,6 +17,7 @@ namespace Biokudi_Backend.UI.Controllers
         private readonly IPersonService _personService = personService;
 
         [HttpGet]
+        [ProducesResponseType(typeof(List<PersonListCrudDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> Get()
         {
             var result = await _personService.GetUsers();
@@ -27,6 +29,7 @@ namespace Biokudi_Backend.UI.Controllers
         }
 
         [HttpGet("{id}")]
+        [ProducesResponseType(typeof(PersonListCrudDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> Get(int id)
         {
             var result = await _personService.GetCrudPersonById(id);
@@ -43,7 +46,7 @@ namespace Biokudi_Backend.UI.Controllers
             var result = await _personService.UpdateCrudUser(id, person);
             if (result.IsFailure)
                 return BadRequest(result.ErrorMessage);
-            return Ok(result.Value);
+            return Ok();
         }
 
         [HttpDelete("{id}")]
