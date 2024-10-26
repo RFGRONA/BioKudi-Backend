@@ -75,6 +75,7 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                     return Result<IEnumerable<CatRoleEntity>>.Success(cachedRoles);
 
                 var roles = await _context.CatRoles
+                    .AsNoTracking()
                     .Select(role => new CatRoleEntity
                     {
                         IdRole = role.IdRole,
@@ -100,7 +101,9 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                 if (cachedRole != null)
                     return Result<CatRoleEntity>.Success(cachedRole);
 
-                var result = await _context.CatRoles.FirstOrDefaultAsync(r => r.IdRole == id);
+                var result = await _context.CatRoles
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(r => r.IdRole == id);
 
                 if (result == null)
                     return Result<CatRoleEntity>.Failure("El rol no fue encontrado.");

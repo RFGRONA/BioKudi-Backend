@@ -76,6 +76,7 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                     return Result<IEnumerable<CatDepartmentEntity>>.Success(cachedDepartments);
 
                 var departments = await _context.CatDepartments
+                    .AsNoTracking()
                     .Select(department => new CatDepartmentEntity
                     {
                         IdDepartment = department.IdDepartment,
@@ -101,7 +102,9 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                 if (cachedDepartment != null)
                     return Result<CatDepartmentEntity>.Success(cachedDepartment);
 
-                var result = await _context.CatDepartments.FirstOrDefaultAsync(d => d.IdDepartment == id);
+                var result = await _context.CatDepartments
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(d => d.IdDepartment == id);
 
                 if (result == null)
                     return Result<CatDepartmentEntity>.Failure("El departamento no fue encontrado.");

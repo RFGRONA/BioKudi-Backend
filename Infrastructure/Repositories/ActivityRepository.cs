@@ -78,7 +78,8 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                     return Result<IEnumerable<CatActivityEntity>>.Success(cachedPlaces);
 
                 var activities = await _context.CatActivities
-                    .Select(a => new CatActivityEntity
+                     .AsNoTracking()
+                     .Select(a => new CatActivityEntity
                     {
                         IdActivity = a.IdActivity,
                         NameActivity = a.NameActivity ?? string.Empty,
@@ -104,7 +105,9 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                 if (cachedPlace != null)
                     return Result<CatActivityEntity>.Success(cachedPlace);
 
-                var activity = await _context.CatActivities.FirstOrDefaultAsync(a => a.IdActivity == id);
+                var activity = await _context.CatActivities
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(a => a.IdActivity == id);
 
                 if (activity == null)
                     return Result<CatActivityEntity>.Failure("La actividad no fue encontrada.");

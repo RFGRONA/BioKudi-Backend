@@ -77,6 +77,7 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                     return Result<IEnumerable<CatCityEntity>>.Success(cachedCities);
 
                 var cities = await _context.CatCities
+                    .AsNoTracking()
                     .Include(c => c.Department)
                     .Select(city => new CatCityEntity
                     {
@@ -110,6 +111,7 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                     return Result<CatCityEntity>.Success(cachedCity);
 
                 var result = await _context.CatCities
+                    .AsNoTracking()
                     .Include(c => c.Department)
                     .FirstOrDefaultAsync(c => c.IdCity == id);
 

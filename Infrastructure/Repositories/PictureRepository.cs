@@ -15,6 +15,7 @@ namespace Biokudi_Backend.Infrastructure.Repositories
             try
             {
                 var pictures = await _context.Pictures
+                    .AsNoTracking()
                     .Select(p => new PictureEntity
                     {
                         IdPicture = p.IdPicture,

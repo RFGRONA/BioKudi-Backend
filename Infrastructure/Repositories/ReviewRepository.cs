@@ -75,6 +75,7 @@ namespace Biokudi_Backend.Infrastructure.Repositories
             try
             {
                 var reviews = await _context.Reviews
+                    .AsNoTracking()
                     .Select(review => new ReviewEntity
                     {
                         IdReview = review.IdReview,
@@ -102,6 +103,7 @@ namespace Biokudi_Backend.Infrastructure.Repositories
             try
             {
                 var result = await _context.Reviews
+                    .AsNoTracking()
                     .Where(r => r.IdReview == id)
                     .Select(review => new ReviewEntity
                     {
@@ -133,6 +135,7 @@ namespace Biokudi_Backend.Infrastructure.Repositories
             try
             {
                 var reviews = await _context.Reviews
+                    .AsNoTracking()
                     .Where(r => r.PlaceId == placeId)
                     .Select(review => new ReviewEntity
                     {

@@ -145,6 +145,7 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                     return Result<IEnumerable<PlaceEntity>>.Success(cachedPlaces);
 
                 var places = await _context.Places
+                    .AsNoTracking()
                     .Include(p => p.Activities)
                     .Include(p => p.Pictures)
                     .Include(p => p.Reviews)
@@ -210,6 +211,7 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                     return Result<PlaceEntity>.Success(cachedPlace);
 
                 var result = await _context.Places
+                    .AsNoTracking()
                     .Include(p => p.Activities)
                     .Include(p => p.Pictures)
                     .Include(p => p.Reviews)
@@ -253,6 +255,19 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                         Name = pic.Name,
                         Link = pic.Link
                     }).ToList() ?? new List<PictureEntity>(),
+                    Reviews = result.Reviews?
+                    .OrderByDescending(r => r.DateCreated)
+                    .Take(5)
+                    .Select(r => new ReviewEntity
+                    {
+                        IdReview = r.IdReview,
+                        Comment = r.Comment,
+                        Rate = r.Rate,
+                        DateCreated = (DateTime)r.DateCreated,
+                        DateModified = r.DateModified,
+                        Person= r.Person,
+                        PersonId = r.PersonId
+                    }).ToList() ?? new List<ReviewEntity>(),
                     Rating = result.Reviews?.Any() == true ? result.Reviews.Average(r => (double)r.Rate) : 0
                 };
 

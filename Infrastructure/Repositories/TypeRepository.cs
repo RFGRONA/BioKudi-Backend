@@ -75,6 +75,7 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                     return Result<IEnumerable<CatTypeEntity>>.Success(cachedTypes);
 
                 var types = await _context.CatTypes
+                    .AsNoTracking()
                     .Select(type => new CatTypeEntity
                     {
                         IdType = type.IdType,
@@ -101,7 +102,9 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                 if (cachedType != null)
                     return Result<CatTypeEntity>.Success(cachedType);
 
-                var result = await _context.CatTypes.FirstOrDefaultAsync(t => t.IdType == id);
+                var result = await _context.CatTypes
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(t => t.IdType == id);
                 if (result == null)
                     return Result<CatTypeEntity>.Failure("El tipo no fue encontrado.");
 

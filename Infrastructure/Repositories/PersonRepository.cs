@@ -54,7 +54,10 @@ namespace Biokudi_Backend.Infrastructure.Repositories
         {
             try
             {
-                var result = await _context.People.Include(p => p.Role).FirstOrDefaultAsync(u => u.Email == email);
+                var result = await _context.People
+                    .AsNoTracking()
+                    .Include(p => p.Role)
+                    .FirstOrDefaultAsync(u => u.Email == email);
                 if (result == null)
                     return Result<PersonEntity>.Failure("Correo no encontrado.");
 
@@ -90,7 +93,11 @@ namespace Biokudi_Backend.Infrastructure.Repositories
         {
             try
             {
-                var result = await _context.People.Include(p => p.Role).Include(p => p.State).FirstOrDefaultAsync(u => u.IdUser == id);
+                var result = await _context.People
+                    .AsNoTracking()
+                    .Include(p => p.Role)
+                    .Include(p => p.State)
+                    .FirstOrDefaultAsync(u => u.IdUser == id);
                 if (result == null)
                     return Result<PersonEntity>.Failure("Usuario no encontrado.");
 
@@ -178,7 +185,11 @@ namespace Biokudi_Backend.Infrastructure.Repositories
         {
             try
             {
-                var result = await _context.People.Include(p => p.Role).Include(p => p.State).ToListAsync();
+                var result = await _context.People
+                    .AsNoTracking()
+                    .Include(p => p.Role)
+                    .Include(p => p.State)
+                    .ToListAsync();
                 return Result<IEnumerable<PersonEntity>>.Success(result.Select(p => new PersonEntity
                 {
                     IdUser = p.IdUser,

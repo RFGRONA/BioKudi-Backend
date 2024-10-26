@@ -74,6 +74,7 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                     return Result<IEnumerable<CatStateEntity>>.Success(cachedStates);
 
                 var states = await _context.CatStates
+                    .AsNoTracking()
                     .Select(state => new CatStateEntity
                     {
                         IdState = state.IdState,
@@ -99,7 +100,9 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                 if (cachedState != null)
                     return Result<CatStateEntity>.Success(cachedState);
 
-                var result = await _context.CatStates.FirstOrDefaultAsync(s => s.IdState == id);
+                var result = await _context.CatStates
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(s => s.IdState == id);
 
                 if (result == null)
                     return Result<CatStateEntity>.Failure("El estado no fue encontrado.");
