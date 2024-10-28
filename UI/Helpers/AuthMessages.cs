@@ -2,11 +2,11 @@
 {
     public static class AuthMessages
     {
-        public static string CaptchaInvalid = "Captcha Invalido";
-        public static string InvalidModel = "Modelo Inválido";
-        public static string InvalidSession = "Sesión Inválida";
-        public static string Logout = "Sesión Cerrada";
-        public static string PersonNotFound = "Usuario no encontrado";
-        public static string PublicKeyError = "Error al obtener la llave pública";
+        public static readonly string CaptchaInvalid = "Captcha Invalido";
+        public static readonly string InvalidModel = "Modelo Inválido";
+        public static readonly string InvalidSession = "Sesión Inválida";
+        public static readonly string Logout = "Sesión Cerrada";
+        public static readonly string PersonNotFound = "Usuario no encontrado";
+        public static readonly string PublicKeyError = "Error al obtener la llave pública";
     }
 }

@@ -56,7 +56,7 @@ namespace Biokudi_Backend.Infrastructure.Config
 
         public void Configure(IConfiguration configuration)
         {
-
+            throw new NotImplementedException();
         }
 
         public Task<HttpResponseMessage> PostAsync(string requestUri, HttpContent content)
