@@ -29,6 +29,7 @@ namespace Biokudi_Backend.Infrastructure.Config
             services.AddScoped<IPictureRepository, PictureRepository>();
             services.AddScoped<IRoleRepository, RoleRepository>();
             services.AddScoped<IReviewRepository, ReviewRepository>();
+            services.AddScoped<ITicketRepository, TicketRepository>();
 
             // Application layer (AddScoped)
             services.AddSingleton<RSAUtility>();
@@ -44,6 +45,7 @@ namespace Biokudi_Backend.Infrastructure.Config
             services.AddScoped<PictureMapping>();
             services.AddScoped<RoleMapping>();
             services.AddScoped<ReviewMapping>();
+            services.AddScoped<TicketMapping>();
 
             services.AddScoped<IPersonService, PersonService>();
             services.AddScoped<IPlaceService, PlaceService>();
@@ -56,6 +58,7 @@ namespace Biokudi_Backend.Infrastructure.Config
             services.AddScoped<IPictureService, PictureService>();
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<IReviewService, ReviewService>();
+            services.AddScoped<ITicketService, TicketService>();
         }
     }
 }
