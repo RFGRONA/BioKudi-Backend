@@ -13,7 +13,7 @@ namespace Biokudi_Backend.Application.Interfaces
         Task<Result<ProfileResponseDto>> GetUserProfile(int id);
         Task<Result<List<PersonListCrudDto>>> GetUsers();
         Task<Result<bool>> UpdateCrudUser(int id, PersonCrudRequestDto person);
-        Task<Result<bool>> UpdateUserProfile(int id, ProfileRequestDto person);
+        Task<Result<bool>> UpdateUserProfile(int id, PersonRequestDto person);
         Task<Result<bool>> DeleteUser(int id);
     }
 }
