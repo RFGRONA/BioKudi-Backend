@@ -1,7 +1,7 @@
 ﻿namespace Biokudi_Backend.Application.Utilities
 {
     using BCrypt.Net;
-    public class PasswordUtility
+    public static class PasswordUtility
     {
         public static string HashPassword(string password)
         {

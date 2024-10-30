@@ -10,7 +10,8 @@ namespace Biokudi_Backend.Application.Mappings
             return new CatActivityEntity
             {
                 IdActivity = activity.IdActivity,
-                NameActivity = activity.NameActivity
+                NameActivity = activity.NameActivity,
+                UrlIcon = activity.UrlIcon 
             };
         }
 
@@ -18,7 +19,8 @@ namespace Biokudi_Backend.Application.Mappings
         {
             return new CatActivityEntity
             {
-                NameActivity = activity.NameActivity
+                NameActivity = activity.NameActivity,
+                UrlIcon = activity.UrlIcon
             };
         }
 
@@ -27,7 +29,8 @@ namespace Biokudi_Backend.Application.Mappings
             return new ActivityDto
             {
                 IdActivity = activity.IdActivity,
-                NameActivity = activity.NameActivity
+                NameActivity = activity.NameActivity,
+                UrlIcon = activity.UrlIcon 
             };
         }
     }

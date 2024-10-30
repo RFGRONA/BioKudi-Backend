@@ -1,6 +1,7 @@
 ﻿using Biokudi_Backend.Application.Interfaces;
 using Biokudi_Backend.Domain.Entities;
 using Biokudi_Backend.Domain.Interfaces;
+using Biokudi_Backend.Domain.ValueObject;
 using Biokudi_Backend.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,7 +13,7 @@ namespace Biokudi_Backend.Infrastructure.Repositories
         private readonly ICacheService _cacheService = cacheService;
         private readonly ApplicationDbContext _context = context;
 
-        public async Task<CatActivityEntity>? Create(CatActivityEntity entity)
+        public async Task<Result<CatActivityEntity>> Create(CatActivityEntity entity)
         {
             try
             {
@@ -21,7 +22,7 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                     .FirstOrDefaultAsync();
 
                 if (existingActivity != null)
-                    throw new InvalidOperationException("La actividad ya existe");
+                    return Result<CatActivityEntity>.Failure("La actividad ya existe.");
 
                 var activity = new CatActivity
                 {
@@ -33,46 +34,52 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                 int rowsAffected = await _context.SaveChangesAsync();
 
                 if (rowsAffected == 0)
-                    throw new InvalidOperationException("No se pudo crear la actividad");
+                    return Result<CatActivityEntity>.Failure("No se pudo crear la actividad.");
+
                 entity.IdActivity = activity.IdActivity;
                 _cacheService.Remove(CACHE_KEY);
-                return entity;
+
+                return Result<CatActivityEntity>.Success(entity);
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error al crear la actividad");
+                return Result<CatActivityEntity>.Failure($"Error al crear la actividad: {ex.Message}");
             }
         }
 
-        public async Task<bool> Delete(int id)
+        public async Task<Result<bool>> Delete(int id)
         {
             try
             {
                 var activity = await _context.CatActivities.FindAsync(id);
                 if (activity == null)
-                    throw new Exception("La actividad no fue encontrada.");
+                    return Result<bool>.Failure("La actividad no fue encontrada.");
 
                 _context.CatActivities.Remove(activity);
                 int rowsAffected = await _context.SaveChangesAsync();
                 _cacheService.Remove(CACHE_KEY);
-                return rowsAffected > 0;
+
+                return rowsAffected > 0
+                    ? Result<bool>.Success(true)
+                    : Result<bool>.Failure("Error al eliminar la actividad.");
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error al eliminar la actividad");
+                return Result<bool>.Failure($"Error al eliminar la actividad: {ex.Message}");
             }
         }
 
-        public async Task<IEnumerable<CatActivityEntity>?> GetAll()
+        public async Task<Result<IEnumerable<CatActivityEntity>>> GetAll()
         {
             try
             {
                 var cachedPlaces = _cacheService.GetCollection<CatActivityEntity>(CACHE_KEY);
                 if (cachedPlaces != null)
-                    return cachedPlaces;
+                    return Result<IEnumerable<CatActivityEntity>>.Success(cachedPlaces);
 
                 var activities = await _context.CatActivities
-                    .Select(a => new CatActivityEntity
+                     .AsNoTracking()
+                     .Select(a => new CatActivityEntity
                     {
                         IdActivity = a.IdActivity,
                         NameActivity = a.NameActivity ?? string.Empty,
@@ -80,27 +87,30 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                     })
                     .ToListAsync();
 
-                return activities;
+                _cacheService.SetCollection(CACHE_KEY, activities, TimeSpan.FromHours(1));
+                return Result<IEnumerable<CatActivityEntity>>.Success(activities);
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error al obtener las actividades");
+                return Result<IEnumerable<CatActivityEntity>>.Failure($"Error al obtener las actividades: {ex.Message}");
             }
         }
 
-        public async Task<CatActivityEntity>? GetById(int id)
+        public async Task<Result<CatActivityEntity>> GetById(int id)
         {
             try
             {
                 var cachedPlaces = _cacheService.GetCollection<CatActivityEntity>(CACHE_KEY);
                 var cachedPlace = cachedPlaces?.FirstOrDefault(p => p.IdActivity == id);
                 if (cachedPlace != null)
-                    return cachedPlace;
+                    return Result<CatActivityEntity>.Success(cachedPlace);
 
-                var activity = await _context.CatActivities.FirstOrDefaultAsync(a => a.IdActivity == id);
+                var activity = await _context.CatActivities
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(a => a.IdActivity == id);
 
                 if (activity == null)
-                    throw new Exception("La actividad no fue encontrada.");
+                    return Result<CatActivityEntity>.Failure("La actividad no fue encontrada.");
 
                 var activityEntity = new CatActivityEntity
                 {
@@ -109,22 +119,22 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                     UrlIcon = activity.UrlIcon ?? string.Empty
                 };
 
-                return activityEntity;
+                return Result<CatActivityEntity>.Success(activityEntity);
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error al obtener la actividad con ID {id}");
+                return Result<CatActivityEntity>.Failure($"Error al obtener la actividad con ID {id}: {ex.Message}");
             }
         }
 
-        public async Task<bool> Update(CatActivityEntity entity)
+        public async Task<Result<bool>> Update(CatActivityEntity entity)
         {
             try
             {
                 var existingActivity = await _context.CatActivities.FindAsync(entity.IdActivity);
 
                 if (existingActivity == null)
-                    throw new Exception("La actividad no fue encontrada.");
+                    return Result<bool>.Failure("La actividad no fue encontrada.");
 
                 existingActivity.NameActivity = entity.NameActivity;
                 existingActivity.UrlIcon = entity.UrlIcon;
@@ -132,13 +142,15 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                 _context.CatActivities.Update(existingActivity);
                 int rowsAffected = await _context.SaveChangesAsync();
                 _cacheService.Remove(CACHE_KEY);
-                return rowsAffected > 0;
+
+                return rowsAffected > 0
+                    ? Result<bool>.Success(true)
+                    : Result<bool>.Failure("Error al actualizar la actividad.");
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error al actualizar la actividad");
+                return Result<bool>.Failure($"Error al actualizar la actividad: {ex.Message}");
             }
         }
     }
 }
- 

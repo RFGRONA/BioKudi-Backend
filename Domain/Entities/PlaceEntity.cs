@@ -18,7 +18,6 @@ namespace Biokudi_Backend.Domain.Entities
         public int? StateId { get; set; }
         public CatCityEntity? City { get; set; }
         public CatStateEntity? State { get; set; }
-
         public ICollection<PictureEntity> Pictures { get; set; } = new List<PictureEntity>();
         public ICollection<PostEntity> Posts { get; set; } = new List<PostEntity>();
         public ICollection<ReviewEntity> Reviews { get; set; } = new List<ReviewEntity>();

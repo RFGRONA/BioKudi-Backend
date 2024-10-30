@@ -1,6 +1,7 @@
 ﻿using Biokudi_Backend.Application.Interfaces;
 using Biokudi_Backend.Domain.Entities;
 using Biokudi_Backend.Domain.Interfaces;
+using Biokudi_Backend.Domain.ValueObject;
 using Biokudi_Backend.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,16 +12,17 @@ namespace Biokudi_Backend.Infrastructure.Repositories
         private const string CACHE_KEY = "DepartmentCache";
         private readonly ICacheService _cacheService = cacheService;
         private readonly ApplicationDbContext _context = context;
-        public async Task<CatDepartmentEntity>? Create(CatDepartmentEntity entity)
+
+        public async Task<Result<CatDepartmentEntity>> Create(CatDepartmentEntity entity)
         {
             try
             {
-                var result = await _context.CatDepartments
+                var existingDepartment = await _context.CatDepartments
                     .Where(d => d.NameDepartment == entity.NameDepartment)
                     .FirstOrDefaultAsync();
 
-                if (result != null)
-                    throw new InvalidOperationException("El departamento ya existe");
+                if (existingDepartment != null)
+                    return Result<CatDepartmentEntity>.Failure("El departamento ya existe.");
 
                 var department = new CatDepartment
                 {
@@ -29,46 +31,52 @@ namespace Biokudi_Backend.Infrastructure.Repositories
 
                 await _context.CatDepartments.AddAsync(department);
                 int rowsAffected = await _context.SaveChangesAsync();
+
                 if (rowsAffected == 0)
-                    throw new InvalidOperationException("No se pudo crear el departamento");
+                    return Result<CatDepartmentEntity>.Failure("No se pudo crear el departamento.");
+
                 entity.IdDepartment = department.IdDepartment;
                 _cacheService.Remove(CACHE_KEY);
-                return entity;
+                return Result<CatDepartmentEntity>.Success(entity);
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error al crear el departamento: {ex.Message}");
+                return Result<CatDepartmentEntity>.Failure($"Error al crear el departamento: {ex.Message}");
             }
         }
 
-        public async Task<bool> Delete(int id)
+        public async Task<Result<bool>> Delete(int id)
         {
             try
             {
                 var entity = await _context.CatDepartments.FindAsync(id);
                 if (entity == null)
-                    throw new Exception("El departamento no fue encontrado.");
+                    return Result<bool>.Failure("El departamento no fue encontrado.");
 
                 _context.CatDepartments.Remove(entity);
                 int rowsAffected = await _context.SaveChangesAsync();
                 _cacheService.Remove(CACHE_KEY);
-                return rowsAffected > 0;
+
+                return rowsAffected > 0
+                    ? Result<bool>.Success(true)
+                    : Result<bool>.Failure("Error al eliminar el departamento.");
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error al eliminar el departamento");
+                return Result<bool>.Failure($"Error al eliminar el departamento: {ex.Message}");
             }
         }
 
-        public async Task<IEnumerable<CatDepartmentEntity>?> GetAll()
+        public async Task<Result<IEnumerable<CatDepartmentEntity>>> GetAll()
         {
             try
             {
-                var cachedPlaces = _cacheService.GetCollection<CatDepartmentEntity>(CACHE_KEY);
-                if (cachedPlaces != null)
-                    return cachedPlaces;
+                var cachedDepartments = _cacheService.GetCollection<CatDepartmentEntity>(CACHE_KEY);
+                if (cachedDepartments != null)
+                    return Result<IEnumerable<CatDepartmentEntity>>.Success(cachedDepartments);
 
                 var departments = await _context.CatDepartments
+                    .AsNoTracking()
                     .Select(department => new CatDepartmentEntity
                     {
                         IdDepartment = department.IdDepartment,
@@ -76,27 +84,30 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                     })
                     .ToListAsync();
 
-                return departments;
+                _cacheService.SetCollection(CACHE_KEY, departments, TimeSpan.FromHours(1));
+                return Result<IEnumerable<CatDepartmentEntity>>.Success(departments);
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error al obtener los departamentos");
+                return Result<IEnumerable<CatDepartmentEntity>>.Failure($"Error al obtener los departamentos: {ex.Message}");
             }
         }
 
-        public async Task<CatDepartmentEntity>? GetById(int id)
+        public async Task<Result<CatDepartmentEntity>> GetById(int id)
         {
             try
             {
-                var cachedPlaces = _cacheService.GetCollection<CatDepartmentEntity>(CACHE_KEY);
-                var cachedPlace = cachedPlaces?.FirstOrDefault(p => p.IdDepartment == id);
-                if (cachedPlace != null)
-                    return cachedPlace;
+                var cachedDepartments = _cacheService.GetCollection<CatDepartmentEntity>(CACHE_KEY);
+                var cachedDepartment = cachedDepartments?.FirstOrDefault(p => p.IdDepartment == id);
+                if (cachedDepartment != null)
+                    return Result<CatDepartmentEntity>.Success(cachedDepartment);
 
-                var result = await _context.CatDepartments.FirstOrDefaultAsync(d => d.IdDepartment == id);
+                var result = await _context.CatDepartments
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(d => d.IdDepartment == id);
 
                 if (result == null)
-                    throw new Exception("El departamento no fue encontrado.");
+                    return Result<CatDepartmentEntity>.Failure("El departamento no fue encontrado.");
 
                 var department = new CatDepartmentEntity
                 {
@@ -104,33 +115,36 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                     NameDepartment = result.NameDepartment ?? string.Empty
                 };
 
-                return department;
+                return Result<CatDepartmentEntity>.Success(department);
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error al obtener el departamento con ID {id}");
+                return Result<CatDepartmentEntity>.Failure($"Error al obtener el departamento con ID {id}: {ex.Message}");
             }
         }
 
-        public async Task<bool> Update(CatDepartmentEntity entity)
+        public async Task<Result<bool>> Update(CatDepartmentEntity entity)
         {
             try
             {
                 var existingEntity = await _context.CatDepartments.FindAsync(entity.IdDepartment);
 
                 if (existingEntity == null)
-                    throw new Exception("El departamento no fue encontrado.");
+                    return Result<bool>.Failure("El departamento no fue encontrado.");
 
                 existingEntity.NameDepartment = entity.NameDepartment;
 
                 _context.CatDepartments.Update(existingEntity);
                 int rowsAffected = await _context.SaveChangesAsync();
                 _cacheService.Remove(CACHE_KEY);
-                return rowsAffected > 0;
+
+                return rowsAffected > 0
+                    ? Result<bool>.Success(true)
+                    : Result<bool>.Failure("Error al actualizar el departamento.");
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error al actualizar el departamento: {ex.Message}");
+                return Result<bool>.Failure($"Error al actualizar el departamento: {ex.Message}");
             }
         }
 

@@ -2,11 +2,11 @@
 {
     public static class AuthMessages
     {
-        public const string CaptchaInvalid = "Captcha Invalido";
-        public const string InvalidModel = "Modelo Inválido";
-        public const string InvalidSession = "Sesión Inválida";
-        public const string Logout = "Sesión Cerrada";
-        public const string PersonNotFound = "Usuario no encontrado";
-        public const string PublicKeyError = "Error al obtener la llave pública";
+        public static readonly string CaptchaInvalid = "Captcha Invalido";
+        public static readonly string InvalidModel = "Modelo Inválido";
+        public static readonly string InvalidSession = "Sesión Inválida";
+        public static readonly string Logout = "Sesión Cerrada";
+        public static readonly string PersonNotFound = "Usuario no encontrado";
+        public static readonly string PublicKeyError = "Error al obtener la llave pública";
     }
 }

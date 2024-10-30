@@ -1,11 +1,10 @@
 ﻿public class CookiesService
 {
-    private readonly IConfiguration _configuration;
     private readonly string? DOMAIN;
 
     public CookiesService(IConfiguration configuration)
     {
-        _configuration = configuration;
+        IConfiguration _configuration = configuration;
         DOMAIN = _configuration["Cookies:Domain"];
     }
 

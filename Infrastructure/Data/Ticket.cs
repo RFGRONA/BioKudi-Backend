@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Biokudi_Backend.Infrastructure;
+﻿namespace Biokudi_Backend.Infrastructure;
 
 public partial class Ticket
 {

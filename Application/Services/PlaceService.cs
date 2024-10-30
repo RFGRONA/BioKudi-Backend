@@ -2,9 +2,8 @@
 using Biokudi_Backend.Application.Interfaces;
 using Biokudi_Backend.Domain.Interfaces;
 using Biokudi_Backend.Application.Mappings;
-using Biokudi_Backend.Application.DTOs;
-using Biokudi_Backend.Infrastructure.Repositories;
 using Biokudi_Backend.Application.DTOs.Request;
+using Biokudi_Backend.Domain.ValueObject;
 
 namespace Biokudi_Backend.Application.Services
 {
@@ -13,102 +12,108 @@ namespace Biokudi_Backend.Application.Services
         private readonly IPlaceRepository _placeRepository = _placeRepository;
         private readonly PlaceMapping _placeMapping = _placeMapping;
 
-        public async Task<bool?> CreatePlace(PlaceRequestDto place)
+        public async Task<Result<bool>> CreatePlace(PlaceRequestDto place)
         {
-            try
-            {
-                var result = await _placeRepository.Create(_placeMapping.RequestToPlaceEntity(place));
-                if (result != null)
-                {
-                    return true;
-                }
-                return false;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            var result = await _placeRepository.Create(_placeMapping.RequestToPlaceEntity(place));
+            return result.IsSuccess ? Result<bool>.Success(true) : Result<bool>.Failure(result.ErrorMessage);
         }
 
-        public async Task<bool> DeletePlace(int id)
+        public async Task<Result<bool>> DeletePlace(int id)
         {
-            try
-            {
-                var result = await _placeRepository.Delete(id);
-                if (result)
-                    return true;
-                return false;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            var result = await _placeRepository.Delete(id);
+            return result.IsSuccess ? Result<bool>.Success(true) : Result<bool>.Failure(result.ErrorMessage);
         }
 
-        public async Task<List<PlaceListCrudDto>?> GetCrudPlaces()
+        public async Task<Result<List<PlaceListCrudDto>>> GetCrudPlaces()
         {
-            try
+            var result = await _placeRepository.GetAll();
+            if (result.IsSuccess)
             {
-                var result = await _placeRepository.GetAll();
-                var places = result
-                .OrderBy(p => p.IdPlace)
-                .Select(p => _placeMapping.PlaceToCrudList(p))
-                .ToList() ?? null;
-                return places;
+                var places = result.Value
+                    .OrderBy(p => p.IdPlace)
+                    .Select(p => _placeMapping.PlaceToCrudList(p))
+                    .ToList();
+
+                return Result<List<PlaceListCrudDto>>.Success(places);
             }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            return Result<List<PlaceListCrudDto>>.Failure(result.ErrorMessage);
         }
 
-        public async Task<PlaceDetailResponseDto?> GetPlaceById(int id)
+        public async Task<Result<List<PlaceListActivityDto>>> GetListActivities()
         {
-            try
+            var result = await _placeRepository.GetAll();
+            if (result.IsSuccess)
             {
-                var result = await _placeRepository.GetById(id) ?? null;
-                return _placeMapping.MapToPlaceDetailResponseDto(result);
+                var places = result.Value
+                    .OrderBy(p => p.NamePlace)
+                    .Select(p => _placeMapping.MapToPlaceListActivityDto(p))
+                    .ToList();
+
+                return Result<List<PlaceListActivityDto>>.Success(places);
             }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            return Result<List<PlaceListActivityDto>>.Failure(result.ErrorMessage);
         }
 
-        public async Task<List<StartCarrouselDto>?> GetStartCarrousel()
+        public async Task<Result<List<PlaceListPointMapDto>>> GetListPointMap()
         {
-            var places = await _placeRepository.GetAll();
-
-            if (places == null || places.Count() < 7)
+            var result = await _placeRepository.GetAll();
+            if (result.IsSuccess)
             {
-                return null;
-            }
-            var startCarrousel = places
-            .OrderByDescending(p => p.Rating)
-            .Take(10)
-            .Select(p => (StartCarrouselDto)_placeMapping.MapPlaceToCarrouselDto(p)) 
-            .ToList();
+                var places = result.Value
+                    .Select(p => _placeMapping.MapToPlaceListPointMapDto(p))
+                    .ToList();
 
-            return startCarrousel;
+                return Result<List<PlaceListPointMapDto>>.Success(places);
+            }
+            return Result<List<PlaceListPointMapDto>>.Failure(result.ErrorMessage);
         }
 
-        public async Task<bool?> UpdatePlace(int id, PlaceRequestDto place)
+        public async Task<Result<PlaceDetailResponseDto>> GetPlaceById(int id)
         {
-            try
+            var result = await _placeRepository.GetById(id);
+            if (result.IsSuccess)
             {
-                var entity = _placeMapping.RequestToPlaceEntity(place);
-                entity.IdPlace = id;
-                var result = await _placeRepository.Update(entity);
-                if (result != null)
-                {
-                    return true;
-                }
-                return false;
+                return Result<PlaceDetailResponseDto>.Success(_placeMapping.MapToPlaceDetailResponseDto(result.Value));
             }
-            catch (Exception ex)
+            return Result<PlaceDetailResponseDto>.Failure(result.ErrorMessage);
+        }
+
+        public async Task<Result<PlaceMapDetailResponseDto>> GetMapPlaceById(int id)
+        {
+            var result = await _placeRepository.GetById(id);
+            if (result.IsSuccess)
             {
-                throw new Exception(ex.Message);
+                return Result<PlaceMapDetailResponseDto>.Success(_placeMapping.ToPlaceMapDetailResponseDto(result.Value));
             }
+            return Result<PlaceMapDetailResponseDto>.Failure(result.ErrorMessage);
+        }
+
+        public async Task<Result<List<StartCarrouselDto>>> GetStartCarrousel()
+        {
+            var result = await _placeRepository.GetAll();
+
+            if (!result.IsSuccess || result.Value.Count() < 7)
+            {
+                return Result<List<StartCarrouselDto>>.Failure("No hay suficientes lugares para mostrar en el carrusel.");
+            }
+
+            var startCarrousel = result.Value
+                .OrderByDescending(p => p.Rating)  
+                .ThenBy(p => p.NamePlace)           
+                .Take(10)
+                .Select(p => (StartCarrouselDto)_placeMapping.MapPlaceToCarrouselDto(p))
+                .ToList();
+
+            return Result<List<StartCarrouselDto>>.Success(startCarrousel);
+        }
+
+        public async Task<Result<bool>> UpdatePlace(int id, PlaceRequestDto place)
+        {
+            var entity = _placeMapping.RequestToPlaceEntity(place);
+            entity.IdPlace = id;
+
+            var result = await _placeRepository.Update(entity);
+            return result.IsSuccess ? Result<bool>.Success(true) : Result<bool>.Failure(result.ErrorMessage);
         }
     }
 }

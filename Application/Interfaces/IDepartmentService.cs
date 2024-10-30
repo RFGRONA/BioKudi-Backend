@@ -1,13 +1,14 @@
 ﻿using Biokudi_Backend.Application.DTOs;
+using Biokudi_Backend.Domain.ValueObject;
 
 namespace Biokudi_Backend.Application.Interfaces
 {
     public interface IDepartmentService
     {
-        Task<List<DepartmentDto>?> GetDepartments();
-        Task<DepartmentDto?> GetDepartmentById(int id);
-        Task<bool> CreateDepartment(DepartmentRequestDto department);
-        Task<bool> UpdateDepartment(int id, DepartmentRequestDto department);
-        Task<bool> DeleteDepartment(int id);
+        Task<Result<List<DepartmentDto>>> GetDepartments();
+        Task<Result<DepartmentDto>> GetDepartmentById(int id);
+        Task<Result<bool>> CreateDepartment(DepartmentRequestDto department);
+        Task<Result<bool>> UpdateDepartment(int id, DepartmentRequestDto department);
+        Task<Result<bool>> DeleteDepartment(int id);
     }
 }

@@ -17,5 +17,6 @@ namespace Biokudi_Backend.Application.DTOs.Response
         public string? CityName { get; set; }
         public int? StateId { get; set; }
         public string? StateName { get; set; }
+        public List<ActivityDto> Activities { get; set; } = null!;
     }
 }

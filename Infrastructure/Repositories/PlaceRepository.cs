@@ -2,6 +2,7 @@
 using Biokudi_Backend.Application.Utilities;
 using Biokudi_Backend.Domain.Entities;
 using Biokudi_Backend.Domain.Interfaces;
+using Biokudi_Backend.Domain.ValueObject;
 using Biokudi_Backend.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,16 +14,16 @@ namespace Biokudi_Backend.Infrastructure.Repositories
         private readonly ICacheService _cacheService = cacheService;
         private readonly ApplicationDbContext _context = context;
 
-        public async Task<PlaceEntity>? Create(PlaceEntity entity)
+        public async Task<Result<PlaceEntity>> Create(PlaceEntity entity)
         {
             if (_context == null)
-                throw new InvalidOperationException("Database context is not initialized.");
+                return Result<PlaceEntity>.Failure("Error al iniciar el contexto con la base de datos");
 
             try
             {
                 var result = await _context.Places.Where(p => p.NamePlace == entity.NamePlace).FirstOrDefaultAsync();
                 if (result != null)
-                    throw new InvalidOperationException("El lugar ya se encuentra registrado");
+                    return Result<PlaceEntity>.Failure("El lugar ya se encuentra registrado");
 
                 var place = new Place
                 {
@@ -32,62 +33,123 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                     Address = entity.Address,
                     Description = entity.Description,
                     Link = entity.Link,
+                    CityId = entity.CityId,
                     StateId = entity.StateId,
                     DateCreated = DateUtility.DateNowColombia(),
                     DateModified = DateUtility.DateNowColombia()
                 };
+
                 if (entity.Activities != null && entity.Activities.Any())
                 {
                     var existingActivities = await _context.CatActivities
                         .Where(a => entity.Activities.Select(ea => ea.IdActivity).Contains(a.IdActivity))
                         .ToListAsync();
-
                     place.Activities = existingActivities;
                 }
 
                 _context.Places.Add(place);
-                var succes = await _context.SaveChangesAsync();
-                if (succes == 0)
-                    throw new InvalidOperationException("Error al guardar los datos en la base de datos");
+                var success = await _context.SaveChangesAsync();
+                if (success == 0)
+                    return Result<PlaceEntity>.Failure("Error al guardar los datos en la base de datos");
+
+                if (entity.Pictures != null && entity.Pictures.Any())
+                {
+                    foreach (var pictureEntity in entity.Pictures)
+                    {
+                        var picture = new Picture
+                        {
+                            Name = pictureEntity.Name,
+                            Link = pictureEntity.Link,
+                            DateCreated = DateTime.Now,
+                            TypeId = 8,
+                            PlaceId = place.IdPlace
+                        };
+                        _context.Pictures.Add(picture);
+                    }
+                    success = await _context.SaveChangesAsync();
+                    if (success == 0)
+                        return Result<PlaceEntity>.Failure("Error al guardar la imagen en la base de datos");
+                }
+
                 entity.IdPlace = place.IdPlace;
                 entity.DateCreated = place.DateCreated;
                 entity.DateModified = place.DateModified;
                 _cacheService.Remove(CACHE_KEY);
-                return entity;
+
+                return Result<PlaceEntity>.Success(entity);
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error al registrar el lugar");
+                return Result<PlaceEntity>.Failure($"Error al registrar el lugar: {ex.Message}");
             }
         }
 
-        public Task<bool> Delete(int id)
+        public async Task<Result<bool>> Delete(int id)
         {
+            if (_context == null)
+                return Result<bool>.Failure("Error al iniciar el contexto con la base de datos");
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                _context.Places.Remove(new Place { IdPlace = id });
-                _context.SaveChanges();
+                var place = await _context.Places
+                    .Include(p => p.Activities)
+                    .Include(p => p.Pictures)
+                    .Include(p => p.Reviews)
+                    .FirstOrDefaultAsync(p => p.IdPlace == id);
+
+                if (place == null)
+                    return Result<bool>.Failure("Lugar no encontrado");
+
+                if (place.Activities != null && place.Activities.Any())
+                {
+                    foreach (var activity in place.Activities)
+                    {
+                        activity.Places.Remove(place);
+                    }
+                }
+
+                if (place.Pictures != null && place.Pictures.Any())
+                {
+                    _context.Pictures.RemoveRange(place.Pictures);
+                }
+
+                if (place.Reviews != null && place.Reviews.Any())
+                {
+                    _context.Reviews.RemoveRange(place.Reviews);
+                }
+
+                _context.Places.Remove(place);
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
                 _cacheService.Remove(CACHE_KEY);
-                return Task.FromResult(true);
+
+                return Result<bool>.Success(true);
             }
-            catch
+            catch (Exception ex)
             {
-                throw new Exception($"Error al eliminar el lugar");
+                await transaction.RollbackAsync();
+                return Result<bool>.Failure($"Error al eliminar el lugar: {ex.Message}");
             }
         }
 
-        public async Task<IEnumerable<PlaceEntity>?> GetAll()
+        public async Task<Result<IEnumerable<PlaceEntity>>> GetAll()
         {
+            if (_context == null)
+                return Result<IEnumerable<PlaceEntity>>.Failure("Error al iniciar el contexto con la base de datos");
+
             try
             {
                 var cachedPlaces = _cacheService.GetCollection<PlaceEntity>(CACHE_KEY);
                 if (cachedPlaces != null)
-                    return cachedPlaces;
+                    return Result<IEnumerable<PlaceEntity>>.Success(cachedPlaces);
 
                 var places = await _context.Places
+                    .AsNoTracking()
                     .Include(p => p.Activities)
                     .Include(p => p.Pictures)
                     .Include(p => p.Reviews)
+                    .Include(p => p.City)
                     .Include(p => p.State)
                     .ToListAsync();
 
@@ -115,7 +177,8 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                     Activities = result.Activities?.Select(a => new CatActivityEntity
                     {
                         IdActivity = a.IdActivity,
-                        NameActivity = a.NameActivity
+                        NameActivity = a.NameActivity,
+                        UrlIcon = a.UrlIcon
                     }).ToList() ?? new List<CatActivityEntity>(),
                     Pictures = result.Pictures?.Select(pic => new PictureEntity
                     {
@@ -124,36 +187,41 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                         Link = pic.Link
                     }).ToList() ?? new List<PictureEntity>(),
                     Rating = result.Reviews?.Any() == true ? result.Reviews.Average(r => (double)r.Rate) : 0
-                })
-                .OrderBy(p => p.NamePlace)
-                .ToList();
-
+                }).OrderBy(p => p.NamePlace).ToList();
 
                 _cacheService.SetCollection(CACHE_KEY, placeEntities, TimeSpan.FromHours(1));
-                Console.WriteLine(placeEntities);
-                return placeEntities;
+                return Result<IEnumerable<PlaceEntity>>.Success(placeEntities);
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error al obtener lugares principales");
+                return Result<IEnumerable<PlaceEntity>>.Failure($"Error al obtener lugares principales: {ex.Message}");
             }
         }
 
-        public async Task<PlaceEntity>? GetById(int id)
+        public async Task<Result<PlaceEntity>> GetById(int id)
         {
+            if (_context == null)
+                return Result<PlaceEntity>.Failure("Error al iniciar el contexto con la base de datos");
+
             try
             {
                 var cachedPlaces = _cacheService.GetCollection<PlaceEntity>(CACHE_KEY);
                 var cachedPlace = cachedPlaces?.FirstOrDefault(p => p.IdPlace == id);
                 if (cachedPlace != null)
-                    return cachedPlace;
+                    return Result<PlaceEntity>.Success(cachedPlace);
+
                 var result = await _context.Places
+                    .AsNoTracking()
                     .Include(p => p.Activities)
                     .Include(p => p.Pictures)
                     .Include(p => p.Reviews)
+                    .Include(p => p.City)
                     .Include(p => p.State)
-                    .FirstOrDefaultAsync(p => p.IdPlace == id)
-                    ?? throw new KeyNotFoundException("Lugar no encontrado");
+                    .FirstOrDefaultAsync(p => p.IdPlace == id);
+
+                if (result == null)
+                    return Result<PlaceEntity>.Failure("Lugar no encontrado");
+
                 var place = new PlaceEntity
                 {
                     IdPlace = result.IdPlace,
@@ -178,7 +246,8 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                     Activities = result.Activities?.Select(a => new CatActivityEntity
                     {
                         IdActivity = a.IdActivity,
-                        NameActivity = a.NameActivity
+                        NameActivity = a.NameActivity,
+                        UrlIcon = a.UrlIcon
                     }).ToList() ?? new List<CatActivityEntity>(),
                     Pictures = result.Pictures?.Select(pic => new PictureEntity
                     {
@@ -186,45 +255,91 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                         Name = pic.Name,
                         Link = pic.Link
                     }).ToList() ?? new List<PictureEntity>(),
+                    Reviews = result.Reviews?
+                    .OrderByDescending(r => r.DateCreated)
+                    .Take(5)
+                    .Select(r => new ReviewEntity
+                    {
+                        IdReview = r.IdReview,
+                        Comment = r.Comment,
+                        Rate = r.Rate,
+                        DateCreated = (DateTime)r.DateCreated,
+                        DateModified = r.DateModified,
+                        Person= r.Person,
+                        PersonId = r.PersonId
+                    }).ToList() ?? new List<ReviewEntity>(),
                     Rating = result.Reviews?.Any() == true ? result.Reviews.Average(r => (double)r.Rate) : 0
                 };
-                return place;
+
+                return Result<PlaceEntity>.Success(place);
             }
-            catch
+            catch (Exception ex)
             {
-                throw new Exception("Error al obtener el lugar");
+                return Result<PlaceEntity>.Failure($"Error al obtener el lugar: {ex.Message}");
             }
         }
 
-        public async Task<bool> Update(PlaceEntity place)
+        public async Task<Result<bool>> Update(PlaceEntity place)
         {
+            if (_context == null)
+                return Result<bool>.Failure("Error al iniciar el contexto con la base de datos");
+
             try
             {
-                var result = await _context.Places.Where(p => p.IdPlace == place.IdPlace)
+                var result = await _context.Places
+                    .Where(p => p.IdPlace == place.IdPlace)
                     .Include(p => p.Activities)
+                    .Include(p => p.Pictures)
                     .FirstOrDefaultAsync();
+
                 if (result == null)
-                    throw new KeyNotFoundException("Lugar no encontrado");
+                    return Result<bool>.Failure("Lugar no encontrado");
+
                 result.NamePlace = place.NamePlace;
                 result.Latitude = place.Latitude;
                 result.Longitude = place.Longitude;
                 result.Address = place.Address;
                 result.Description = place.Description;
                 result.Link = place.Link;
+                result.CityId = place.CityId;
                 result.StateId = place.StateId;
                 result.DateModified = DateUtility.DateNowColombia();
-                var activityIds = place.Activities.Select(a => a.IdActivity).ToList();
 
+                var activityIds = place.Activities.Select(a => a.IdActivity).ToList();
                 result.Activities = await _context.CatActivities
                     .Where(a => activityIds.Contains(a.IdActivity))
                     .ToListAsync();
+
+                if (place.Pictures != null && place.Pictures.Any())
+                {
+                    var existingPictures = await _context.Pictures.Where(p => p.PlaceId == place.IdPlace).ToListAsync();
+                    if (existingPictures.Any())
+                    {
+                        _context.Pictures.RemoveRange(existingPictures);
+                    }
+
+                    foreach (var pictureEntity in place.Pictures)
+                    {
+                        var picture = new Picture
+                        {
+                            Name = pictureEntity.Name,
+                            Link = pictureEntity.Link,
+                            DateCreated = DateTime.Now,
+                            TypeId = 8,
+                            PlaceId = result.IdPlace
+                        };
+                        _context.Pictures.Add(picture);
+                    }
+                }
+
                 await _context.SaveChangesAsync();
                 _cacheService.Remove(CACHE_KEY);
-                return true;
+
+                return Result<bool>.Success(true);
             }
-            catch
+            catch (Exception ex)
             {
-                throw new Exception("Error al actualizar el lugar");
+                return Result<bool>.Failure($"Error al actualizar el lugar: {ex.Message}");
             }
         }
 

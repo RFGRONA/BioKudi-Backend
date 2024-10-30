@@ -1,15 +1,9 @@
 ﻿namespace Biokudi_Backend.UI.Middleware
 {
-    public class TokenRenewalMiddleware
+    public class TokenRenewalMiddleware(RequestDelegate next, ILogger<TokenRenewalMiddleware> logger)
     {
-        private readonly RequestDelegate _next;
-        private readonly ILogger<TokenRenewalMiddleware> _logger;
-
-        public TokenRenewalMiddleware(RequestDelegate next, ILogger<TokenRenewalMiddleware> logger)
-        {
-            _next = next;
-            _logger = logger;
-        }
+        private readonly RequestDelegate _next = next;
+        private readonly ILogger<TokenRenewalMiddleware> _logger = logger;
 
         public async Task InvokeAsync(HttpContext context, AuthService authService, CookiesService cookiesService)
         {
