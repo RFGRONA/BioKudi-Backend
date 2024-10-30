@@ -1,0 +1,71 @@
+name: Deploy to FTP Server
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out the code
+      uses: actions/checkout@v4
+
+    - name: Set up .NET Core
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.x' 
+
+    - name: Create appsettings.json
+      run: |
+        echo '{
+          "Logging": {
+            "LogLevel": {
+              "Default": "Information",
+              "Microsoft.AspNetCore": "Warning"
+            },
+            "BetterStack": {
+              "ApiToken": "${{ secrets.BETTER_STACK_KEY }}"
+            }
+          },
+          "AllowedHosts": "*",
+          "ConnectionStrings": {
+            "ConnectionString": "${{ secrets.CONNECTION_STRING }}",
+          },
+          "ApiKeys": {
+            "CaptchaKey": "${{ secrets.CAPTCHA_KEY }}",
+          },
+          "Jwt": {
+            "Key": "${{ secrets.JWT_KEY }}",
+            "Issuer": "${{ secrets.JWT_ISSUER }}",
+            "Audience": "${{ secrets.JWT_AUDIENCE }}"
+          },
+          "Smtp": {
+            "Host": "${{ secrets.SMTP_HOST }}",
+            "Port": "${{ secrets.SMTP_PORT }}",
+            "User": "${{ secrets.SMTP_USER }}",
+            "Password": "${{ secrets.SMTP_PASSWORD }}"
+          },
+            "Cookies": {
+              "Domain": "${{ secrets.COOKIES_DOMAIN }}"
+            }
+        }' > appsettings.json
+    
+    - name: Build and publish
+      run: |
+        dotnet restore
+        dotnet build --configuration Release
+        dotnet publish -c Release -o ./publish
+
+    - name: FTP Deploy
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        local-dir: './output/'
+        server-dir: '${{ secrets.FTP_SERVERDIR }}'
+
+

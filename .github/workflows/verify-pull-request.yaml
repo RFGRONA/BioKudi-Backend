@@ -1,0 +1,28 @@
+name: Check Pull Request
+
+on:
+  pull_request:
+    branches:
+      - beta
+
+jobs:
+  check-and-merge:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out the code
+      uses: actions/checkout@v4
+
+    - name: Set up .NET Core
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.x'
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build the project
+      run: dotnet build --configuration Release
+
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
