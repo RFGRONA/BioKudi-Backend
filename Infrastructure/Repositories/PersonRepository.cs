@@ -141,14 +141,15 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                 if (existingUser == null)
                     return Result<bool>.Failure("Usuario no encontrado.");
 
-                existingUser.NameUser = user.NameUser;
-                existingUser.Email = user.Email;
-                existingUser.RoleId = user.RoleId;
-                existingUser.StateId = user.StateId;
-                existingUser.Telephone = user.Telephone;
-                existingUser.EmailNotification = user.EmailNotification;
-                existingUser.EmailPost = user.EmailPost;
-                existingUser.EmailList = user.EmailList;
+                existingUser.NameUser = user.NameUser != null && user.NameUser != existingUser.NameUser ? user.NameUser : existingUser.NameUser;
+                existingUser.Email = user.Email != null && user.Email != existingUser.Email ? user.Email : existingUser.Email;
+                existingUser.RoleId = user.RoleId != 0 && user.RoleId != existingUser.RoleId ? user.RoleId : existingUser.RoleId;
+                existingUser.StateId = user.StateId != null && user.StateId != existingUser.StateId ? user.StateId : existingUser.StateId;
+                existingUser.Telephone = user.Telephone != null && user.Telephone != existingUser.Telephone ? user.Telephone : existingUser.Telephone;
+                existingUser.EmailNotification = user.EmailNotification != null && user.EmailNotification != existingUser.EmailNotification ? user.EmailNotification : existingUser.EmailNotification;
+                existingUser.EmailPost = user.EmailPost != null && user.EmailPost != existingUser.EmailPost ? user.EmailPost : existingUser.EmailPost;
+                existingUser.EmailList = user.EmailList != null && user.EmailList != existingUser.EmailList ? user.EmailList : existingUser.EmailList;
+
                 existingUser.DateModified = DateUtility.DateNowColombia();
 
                 _context.People.Update(existingUser);

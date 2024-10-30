@@ -19,9 +19,6 @@ namespace Biokudi_Backend.Application.Validators
             RuleFor(x => x.Telephone)
                 .MaximumLength(15).WithMessage("El número de teléfono no debe exceder los 15 caracteres.")
                 .Matches(@"^\d+$").WithMessage("El número de teléfono debe contener solo dígitos.");
-
-            RuleFor(x => x.StateId)
-                .GreaterThan(0).When(x => x.StateId.HasValue).WithMessage("El ID del estado debe ser mayor que cero.");
         }
     }
 

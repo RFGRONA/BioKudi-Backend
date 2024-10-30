@@ -25,6 +25,9 @@ jobs:
             "LogLevel": {
               "Default": "Information",
               "Microsoft.AspNetCore": "Warning"
+            },
+            "BetterStack": {
+              "ApiToken": "${{ secrets.BETTER_STACK_KEY }}"
             }
           },
           "AllowedHosts": "*",
