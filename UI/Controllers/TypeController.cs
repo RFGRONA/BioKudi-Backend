@@ -13,7 +13,7 @@ namespace Biokudi_Backend.UI.Controllers
         private readonly ITypeService _typeService = typeService;
 
         [HttpGet]
-        [Authorize(Roles = "Admin, Editor")]
+        [Authorize]
         [ProducesResponseType(typeof(List<TypeDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> Get()
         {

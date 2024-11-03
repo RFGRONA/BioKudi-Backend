@@ -11,7 +11,9 @@
         public int PersonId { get; set; }
         public string? PersonName { get; set; }
         public string? PersonEmail { get; set; }
+        public string? StateName { get; set; }
         public int? StateId { get; set; }
+        public string? TypeName { get; set; }
         public int? TypeId { get; set; }
     }
 }
