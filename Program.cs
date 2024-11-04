@@ -40,6 +40,11 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseReDoc(c =>
+    {
+        c.Path = "/redoc";
+        c.DocumentPath = "/swagger/v1/swagger.json";
+    });
 }
 
 app.UseHttpsRedirection();
