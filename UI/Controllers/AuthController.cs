@@ -70,14 +70,14 @@ namespace Biokudi_Backend.UI.Controllers
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userId) || !int.TryParse(userId, out int parsedUserId))
-                return BadRequest(AuthMessages.InvalidSession);
+                return BadRequest(MessagesHelper.InvalidSession);
 
             var result = await _personService.GetPersonById(parsedUserId);
 
             if (result.IsFailure)
                 return BadRequest(result.ErrorMessage);
             if (result.Value == null)
-                return NotFound(AuthMessages.PersonNotFound);
+                return NotFound(MessagesHelper.PersonNotFound);
 
             return Ok(result.Value);
         }
@@ -89,14 +89,14 @@ namespace Biokudi_Backend.UI.Controllers
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userId) || !int.TryParse(userId, out int parsedUserId))
-                return BadRequest(AuthMessages.InvalidSession);
+                return BadRequest(MessagesHelper.InvalidSession);
 
             var result = await _personService.GetUserProfile(parsedUserId);
 
             if (result.IsFailure)
                 return BadRequest(result.ErrorMessage);
             if (result.Value == null)
-                return NotFound(AuthMessages.PersonNotFound);
+                return NotFound(MessagesHelper.PersonNotFound);
 
             return Ok(result.Value);
         }
@@ -107,14 +107,14 @@ namespace Biokudi_Backend.UI.Controllers
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userId) || !int.TryParse(userId, out int parsedUserId))
-                return BadRequest(AuthMessages.InvalidSession);
+                return BadRequest(MessagesHelper.InvalidSession);
 
             var result = await _personService.UpdateUserProfile(parsedUserId, person);
 
             if (result.IsFailure)
                 return BadRequest(result.ErrorMessage);
             if (!result.Value)
-                return NotFound(AuthMessages.PersonNotFound);
+                return NotFound(MessagesHelper.PersonNotFound);
 
             return Ok();
         }
@@ -125,14 +125,14 @@ namespace Biokudi_Backend.UI.Controllers
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userId) || !int.TryParse(userId, out int parsedUserId))
-                return BadRequest(AuthMessages.InvalidSession);
+                return BadRequest(MessagesHelper.InvalidSession);
 
             var result = await _personService.DeleteUser(parsedUserId);
 
             if (result.IsFailure)
                 return BadRequest(result.ErrorMessage);
             if (!result.Value)
-                return NotFound(AuthMessages.PersonNotFound);
+                return NotFound(MessagesHelper.PersonNotFound);
 
             return Ok();
         }
@@ -142,7 +142,7 @@ namespace Biokudi_Backend.UI.Controllers
         public IActionResult Logout()
         {
             _cookieService.RemoveCookies(HttpContext);
-            return Ok(AuthMessages.Logout);
+            return Ok(MessagesHelper.Logout);
         }
 
         [HttpGet("public-key")]
@@ -156,7 +156,7 @@ namespace Biokudi_Backend.UI.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, AuthMessages.PublicKeyError);
+                return StatusCode(500, MessagesHelper.PublicKeyError);
             }
         }
 
