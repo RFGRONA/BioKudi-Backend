@@ -85,10 +85,11 @@ namespace Biokudi_Backend.Application.Services
         {
             try
             {
-                byte[] fileBytes = Convert.FromBase64String(sendReportEmailDto.FileBase64);
                 string fileName = $"Reporte_{DateUtility.DateNowColombia:yyyyMMddHHmmss}.pdf";
 
-                _emailUtility.SendEmail(sendReportEmailDto.RecipientEmail, $"Reporte {sendReportEmailDto.TableName}", _emailUtility.CreateReportEmail(sendReportEmailDto.TableName));
+                string emailMessage = _emailUtility.CreateReportEmail(sendReportEmailDto.TableName);
+
+                _emailUtility.SendEmailWithAttachment(sendReportEmailDto.RecipientEmail, $"Reporte {sendReportEmailDto.TableName}", emailMessage, sendReportEmailDto.FileBase64, fileName);
 
                 return Result.Success();
             }
