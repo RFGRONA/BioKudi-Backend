@@ -6,7 +6,7 @@ using System.Reflection;
 namespace Biokudi_Backend.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     public class StatusController(ApplicationDbContext dbContext) : ControllerBase
     {
         private readonly ApplicationDbContext _dbContext = dbContext;

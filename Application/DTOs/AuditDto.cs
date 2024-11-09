@@ -20,7 +20,7 @@
 
     public class WeeklyActivity
     {
-        public DateTime Date { get; set; }
+        public DateOnly Date { get; set; }
         public int InsertCount { get; set; }
         public int UpdateCount { get; set; }
         public int DeleteCount { get; set; }

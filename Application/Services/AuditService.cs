@@ -6,8 +6,6 @@ using Biokudi_Backend.Application.Utilities;
 using Biokudi_Backend.Domain.Interfaces;
 using Biokudi_Backend.Domain.ValueObject;
 using Serilog;
-using System.Net.Mail;
-using System.Net.Mime;
 
 namespace Biokudi_Backend.Application.Services
 {
@@ -42,7 +40,7 @@ namespace Biokudi_Backend.Application.Services
             };
 
             var lastWeekDates = Enumerable.Range(0, 7)
-                .Select(offset => DateTime.UtcNow.Date.AddDays(-offset))
+                .Select(offset => DateOnly.FromDateTime(DateTime.UtcNow.Date.AddDays(-offset)))
                 .OrderByDescending(date => date)
                 .ToList();
 
@@ -50,9 +48,9 @@ namespace Biokudi_Backend.Application.Services
                 .Select(date => new WeeklyActivity
                 {
                     Date = date,
-                    InsertCount = filteredAudits.Count(a => a.Action == "INSERT" && a.Date.Value.Date == date),
-                    UpdateCount = filteredAudits.Count(a => a.Action == "UPDATE" && a.Date.Value.Date == date),
-                    DeleteCount = filteredAudits.Count(a => a.Action == "DELETE" && a.Date.Value.Date == date)
+                    InsertCount = filteredAudits.Count(a => a.Action == "INSERT" && a.Date.HasValue && DateOnly.FromDateTime(a.Date.Value.Date) == date),
+                    UpdateCount = filteredAudits.Count(a => a.Action == "UPDATE" && a.Date.HasValue && DateOnly.FromDateTime(a.Date.Value.Date) == date),
+                    DeleteCount = filteredAudits.Count(a => a.Action == "DELETE" && a.Date.HasValue && DateOnly.FromDateTime(a.Date.Value.Date) == date)
                 })
                 .ToList();
 
@@ -85,7 +83,7 @@ namespace Biokudi_Backend.Application.Services
         {
             try
             {
-                string fileName = $"Reporte_{DateUtility.DateNowColombia:yyyyMMddHHmmss}.pdf";
+                string fileName = $"Reporte_{DateUtility.DateNowColombia():yyyyMMdd_HHmmss}.pdf";
 
                 string emailMessage = _emailUtility.CreateReportEmail(sendReportEmailDto.TableName);
 
