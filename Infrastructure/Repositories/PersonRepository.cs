@@ -24,7 +24,6 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                     NameUser = user.NameUser,
                     Email = user.Email,
                     Password = user.Password,
-                    Hash = user.Hash,
                     RoleId = user.RoleId,
                     StateId = user.StateId,
                     Telephone = user.Telephone,
@@ -223,19 +222,28 @@ namespace Biokudi_Backend.Infrastructure.Repositories
             }
         }
 
-        public Task<Result<IEnumerable<PersonEntity>>> GetAccountsDeleted()
+        public async Task<Result<bool>> UpdateUserPassword(PersonEntity user)
         {
-            throw new NotImplementedException();
-        }
+            try
+            {
+                var existingUser = await _context.People.FindAsync(user.IdUser);
+                if (existingUser == null)
+                    return Result<bool>.Failure("Usuario no encontrado.");
 
-        public Task<Result<IEnumerable<PersonEntity>>> GetAccountsByRole(int role)
-        {
-            throw new NotImplementedException();
-        }
+                existingUser.Password = user.Password;
+                existingUser.DateModified = DateUtility.DateNowColombia();
 
-        public Task<Result<IEnumerable<PersonEntity>>> GetAccountsByState(int state)
-        {
-            throw new NotImplementedException();
+                _context.People.Update(existingUser);
+                int rowsAffected = await _context.SaveChangesAsync();
+
+                return rowsAffected > 0
+                    ? Result<bool>.Success(true)
+                    : Result<bool>.Failure("Error al actualizar la contraseña.");
+            }
+            catch (Exception ex)
+            {
+                return Result<bool>.Failure($"Error al actualizar la contraseña: {ex.Message}");
+            }
         }
     }
 }

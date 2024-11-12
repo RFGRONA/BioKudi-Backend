@@ -34,6 +34,7 @@ namespace Biokudi_Backend.Infrastructure.Config
 
             // Application layer (AddScoped)
             services.AddSingleton<RSAUtility>();
+            services.AddScoped<JwtUtility>();
             services.AddScoped<EmailUtility>();
 
             services.AddScoped<PersonMapping>();

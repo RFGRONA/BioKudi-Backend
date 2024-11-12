@@ -137,6 +137,47 @@ namespace Biokudi_Backend.UI.Controllers
             return Ok();
         }
 
+        [HttpPost("update-password")]
+        [Authorize]
+        public async Task<IActionResult> UpdatePassword([FromBody] UpdatePasswordRequestDto request)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId) || !int.TryParse(userId, out int parsedUserId))
+                return BadRequest(MessagesHelper.InvalidSession);
+
+            var result = await _personService.UpdatePassword(parsedUserId, request);
+            if (result.IsFailure)
+                return BadRequest(result.ErrorMessage);
+
+            return Ok();
+        }
+
+        [HttpPost("request-reset-password")]
+        public async Task<IActionResult> RequestResetToken([FromBody] ForgotPasswordRequestDto request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest("Modelo no válido.");
+
+            var result = await _personService.GeneratePasswordResetToken(request.Email);
+            if (result.IsFailure)
+                return BadRequest(result.ErrorMessage);
+
+            return Ok(MessagesHelper.RequestForgotPassword);
+        }
+
+        [HttpPost("verify-reset-password")]
+        public async Task<IActionResult> VerifyResetToken([FromBody] ResetPasswordRequestDto request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest("Modelo no válido.");
+
+            var result = await _personService.VerifyAndResetPassword(request);
+            if (result.IsFailure)
+                return BadRequest(result.ErrorMessage);
+
+            return Ok(MessagesHelper.VerifyForgotPassword);
+        }
+
         [HttpPost("logout")]
         [Authorize]
         public IActionResult Logout()

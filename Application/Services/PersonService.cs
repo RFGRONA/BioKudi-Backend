@@ -9,12 +9,15 @@ using Biokudi_Backend.Infrastructure.Repositories;
 
 namespace Biokudi_Backend.Application.Services
 {
-    public class PersonService(IPersonRepository personRepository, EmailUtility emailUtility, RSAUtility rsaUtility, PersonMapping personMapping) : IPersonService
+    public class PersonService(IPersonRepository personRepository, EmailUtility emailUtility, RSAUtility rsaUtility, 
+        PersonMapping personMapping, JwtUtility jwtUtility, ICacheService cacheService) : IPersonService
     {
         private readonly IPersonRepository _personRepository = personRepository;
         private readonly EmailUtility _emailUtility = emailUtility;
         private readonly RSAUtility _rsaUtility = rsaUtility;
         private readonly PersonMapping _personMapping = personMapping;
+        private readonly JwtUtility _jwtUtility = jwtUtility;
+        private readonly ICacheService _cache = cacheService;
 
         public async Task<Result<LoginResponseDto>> GetPersonById(int id)
         {
@@ -104,5 +107,68 @@ namespace Biokudi_Backend.Application.Services
                 ? Result<PersonCrudResponseDto>.Success(_personMapping.EntityToPersonCrudResponse(result.Value))
                 : Result<PersonCrudResponseDto>.Failure(result.ErrorMessage);
         }
+
+        public async Task<Result<bool>> GeneratePasswordResetToken(string email)
+        {
+            var result = await _personRepository.GetAccountByEmail(email);
+            if (!result.IsSuccess || result.Value == null)
+                return Result<bool>.Failure("Correo no registrado.");
+
+            string resetToken = _jwtUtility.GenerateJwtToken(email);
+            _cache.Set($"PasswordReset_{email}", resetToken, TimeSpan.FromMinutes(30));
+            _emailUtility.SendEmail(result.Value.Email, "Token de restablecimiento de contraseña", _emailUtility.PasswordResetTokenEmail(resetToken));
+
+            return Result<bool>.Success(true);
+        }
+
+        public async Task<Result<bool>> VerifyAndResetPassword(ResetPasswordRequestDto request)
+        {
+            if (!_jwtUtility.ValidateJwtToken(request.Token, request.Email))
+                return Result<bool>.Failure("Token inválido o expirado.");
+
+            var cachedToken = _cache.Get<string>($"PasswordReset_{request.Email}");
+            if (cachedToken == null || cachedToken != request.Token)
+                return Result<bool>.Failure("Token inválido o expirado.");
+
+            _cache.Remove($"PasswordReset_{request.Email}");
+
+            var result = await _personRepository.GetAccountByEmail(request.Email);
+            if (!result.IsSuccess || result.Value == null)
+                return Result<bool>.Failure("Correo no registrado.");
+
+            request.NewPassword = _rsaUtility.DecryptWithPrivateKey(request.NewPassword);
+            string hashedPassword = PasswordUtility.HashPassword(request.NewPassword);
+            result.Value.Password = hashedPassword;
+
+            var updateResult = await _personRepository.UpdateUserPassword(result.Value);
+            if (!updateResult.IsSuccess)
+                return Result<bool>.Failure("No se pudo actualizar la contraseña.");
+
+            _emailUtility.SendEmail(result.Value.Email, "Cambio de contraseña exitoso", _emailUtility.PasswordChangeConfirmationEmail());
+            return Result<bool>.Success(true);
+        }
+
+        public async Task<Result<bool>> UpdatePassword(int userId, UpdatePasswordRequestDto request)
+        {
+            var result = await _personRepository.GetById(userId);
+            if (!result.IsSuccess || result.Value == null)
+                return Result<bool>.Failure("Usuario no encontrado.");
+
+            var user = result.Value;
+
+            if (!PasswordUtility.VerifyPassword(request.CurrentPassword, user.Password))
+                return Result<bool>.Failure("La contraseña actual es incorrecta.");
+
+            request.NewPassword = _rsaUtility.DecryptWithPrivateKey(request.NewPassword);
+            user.Password = PasswordUtility.HashPassword(request.NewPassword);
+
+            var updateResult = await _personRepository.UpdateUserPassword(user);
+            if (!updateResult.IsSuccess)
+                return Result<bool>.Failure("No se pudo actualizar la contraseña.");
+
+            _emailUtility.SendEmail(result.Value.Email, "Cambio de contraseña exitoso", _emailUtility.PasswordChangeConfirmationEmail());
+            return Result<bool>.Success(true);
+        }
+
     }
 }
