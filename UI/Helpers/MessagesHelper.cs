@@ -9,5 +9,7 @@
         public static readonly string PersonNotFound = "Usuario no encontrado";
         public static readonly string PublicKeyError = "Error al obtener la llave pública";
         public static readonly string DataInvalidError = "Datos inválidos.";
+        public static readonly string RequestForgotPassword = "Se ha enviado un token para reestablecer su contraseña a su correo.";
+        public static readonly string VerifyForgotPassword = "Se cambio su contraseña correctamente";
     }
 }
