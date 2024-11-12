@@ -54,5 +54,13 @@ namespace Biokudi_Backend.UI.Controllers
             var result = await _reviewService.DeleteReview(id);
             return result.IsSuccess ? Ok() : BadRequest(result.ErrorMessage);
         }
+
+        [HttpDelete("/ReviewByAdmin/{id}")]
+        [Authorize(Roles = "Admin, Editor")]
+        public async Task<IActionResult> DeleteReviewByAdmin(int id, [FromBody] ReviewDeleteByAdminDto dto)
+        {
+            var result = await _reviewService.DeleteReviewByAdmin(id, dto);
+            return result.IsSuccess ? Ok() : BadRequest(result.ErrorMessage);
+        }
     }
 }
