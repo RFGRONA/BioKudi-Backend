@@ -1,4 +1,4 @@
-﻿using Biokudi_Backend.Infrastructure;
+﻿using Biokudi_Backend.Infrastructure.Data;
 
 namespace Biokudi_Backend.Domain.Entities
 {
