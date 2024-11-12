@@ -33,12 +33,31 @@ namespace Biokudi_Backend.UI.Controllers
             return result.IsSuccess ? Ok(result.Value) : NotFound(result.ErrorMessage);
         }
 
+        [HttpPost]
+        [Route("/Place/Search")]
+        [ProducesResponseType(typeof(List<PlaceListActivityDto>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> SearchPlaces([FromBody] PlaceSearchRequestDto request)
+        {
+            var result = await _placeService.SearchPlaces(request);
+            return result.IsSuccess ? Ok(result.Value) : NotFound(result.ErrorMessage);
+        }
+
         [HttpGet("{id}")]
         [Authorize(Roles = "Admin, Editor")]
         [ProducesResponseType(typeof(PlaceDetailResponseDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetPlaceById(int id)
         {
             var result = await _placeService.GetPlaceById(id);
+            return result.IsSuccess ? Ok(result.Value) : NotFound(result.ErrorMessage);
+        }
+
+        [HttpGet]
+        [Route("/Place/Random")]
+        [Authorize]
+        [ProducesResponseType(typeof(PlaceDetailResponseDto), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetRandomPlace()
+        {
+            var result = await _placeService.GetMapRandomPlace();
             return result.IsSuccess ? Ok(result.Value) : NotFound(result.ErrorMessage);
         }
 
