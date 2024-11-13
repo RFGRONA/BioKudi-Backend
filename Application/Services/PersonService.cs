@@ -155,7 +155,7 @@ namespace Biokudi_Backend.Application.Services
                 return Result<bool>.Failure("Usuario no encontrado.");
 
             var user = result.Value;
-
+            request.CurrentPassword = _rsaUtility.DecryptWithPrivateKey(request.CurrentPassword);
             if (!PasswordUtility.VerifyPassword(request.CurrentPassword, user.Password))
                 return Result<bool>.Failure("La contraseña actual es incorrecta.");
 

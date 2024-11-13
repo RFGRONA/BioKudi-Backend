@@ -38,6 +38,7 @@ namespace Biokudi_Backend.Application.Mappings
                 DateModified = entity.DateModified?.ToString("yyyy-MM-dd") ?? string.Empty,
                 PersonId = entity.PersonId,
                 PersonName = entity.Person.NameUser,
+                PersonEmail = entity.Person.Email,
                 PlaceId = entity.PlaceId,
                 PlaceName = entity.Place.NamePlace 
             };
