@@ -12,6 +12,9 @@ namespace Biokudi_Backend.UI.Controllers
     {
         private readonly IReviewService _reviewService = reviewService;
 
+        /// <summary>
+        /// Obtiene todas las reseñas.
+        /// </summary>
         [HttpGet]
         [Authorize(Roles = "Admin, Editor")]
         [ProducesResponseType(typeof(List<ReviewResponseDto>), StatusCodes.Status200OK)]
@@ -21,6 +24,10 @@ namespace Biokudi_Backend.UI.Controllers
             return result.IsSuccess ? Ok(result.Value) : NotFound(result.ErrorMessage);
         }
 
+        /// <summary>
+        /// Obtiene una reseña específica por su ID.
+        /// </summary>
+        /// <param name="id">El ID de la reseña a obtener.</param>
         [HttpGet("{id}")]
         [Authorize]
         [ProducesResponseType(typeof(ReviewResponseDto), StatusCodes.Status200OK)]
@@ -30,6 +37,10 @@ namespace Biokudi_Backend.UI.Controllers
             return result.IsSuccess ? Ok(result.Value) : NotFound(result.ErrorMessage);
         }
 
+        /// <summary>
+        /// Crea una nueva reseña.
+        /// </summary>
+        /// <param name="review">Los datos de la reseña a crear.</param>
         [HttpPost]
         [Authorize]
         [ProducesResponseType(typeof(ReviewResponseDto), StatusCodes.Status200OK)]
@@ -39,6 +50,11 @@ namespace Biokudi_Backend.UI.Controllers
             return result.IsSuccess ? Ok(result.Value) : BadRequest(result.ErrorMessage);
         }
 
+        /// <summary>
+        /// Actualiza una reseña existente.
+        /// </summary>
+        /// <param name="id">El ID de la reseña a actualizar.</param>
+        /// <param name="review">Los nuevos datos de la reseña.</param>
         [HttpPut("{id}")]
         [Authorize]
         public async Task<IActionResult> UpdateReview(int id, [FromBody] UpdateReviewRequestDto review)
@@ -47,6 +63,10 @@ namespace Biokudi_Backend.UI.Controllers
             return result.IsSuccess ? Ok() : BadRequest(result.ErrorMessage);
         }
 
+        /// <summary>
+        /// Elimina una reseña por su ID.
+        /// </summary>
+        /// <param name="id">El ID de la reseña a eliminar.</param>
         [HttpDelete("{id}")]
         [Authorize]
         public async Task<IActionResult> DeleteReview(int id)
@@ -55,6 +75,11 @@ namespace Biokudi_Backend.UI.Controllers
             return result.IsSuccess ? Ok() : BadRequest(result.ErrorMessage);
         }
 
+        /// <summary>
+        /// Elimina una reseña por su ID mediante un administrador.
+        /// </summary>
+        /// <param name="id">El ID de la reseña a eliminar.</param>
+        /// <param name="dto">Información adicional para la eliminación de la reseña.</param>
         [HttpDelete("/ReviewByAdmin/{id}")]
         [Authorize(Roles = "Admin, Editor")]
         public async Task<IActionResult> DeleteReviewByAdmin(int id, [FromBody] ReviewDeleteByAdminDto dto)

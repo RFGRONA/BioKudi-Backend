@@ -12,6 +12,9 @@ namespace Biokudi_Backend.UI.Controllers
         private readonly IPlaceService _placeService = placeService;
         private readonly IReviewService _reviewService = reviewService;
 
+        /// <summary>
+        /// Obtiene una lista de puntos en el mapa.
+        /// </summary>
         [HttpGet]
         [Route("Points")]
         [OutputCache(Duration = 300)]
@@ -22,6 +25,10 @@ namespace Biokudi_Backend.UI.Controllers
             return result.IsSuccess ? Ok(result.Value) : NotFound(result.ErrorMessage);
         }
 
+        /// <summary>
+        /// Obtiene los detalles de un lugar en el mapa por su ID.
+        /// </summary>
+        /// <param name="id">ID del lugar en el mapa.</param>
         [HttpGet("Place/{id}")]
         [OutputCache(Duration = 60)]
         [ProducesResponseType(typeof(PlaceMapDetailResponseDto), StatusCodes.Status200OK)]
@@ -31,6 +38,10 @@ namespace Biokudi_Backend.UI.Controllers
             return result.IsSuccess ? Ok(result.Value) : NotFound(result.ErrorMessage);
         }
 
+        /// <summary>
+        /// Obtiene las reseñas de un lugar en el mapa por su ID.
+        /// </summary>
+        /// <param name="id">ID del lugar para obtener reseñas.</param>
         [HttpGet("Reviews/{id}")]
         [OutputCache(Duration = 60)]
         [ProducesResponseType(typeof(List<ReviewMapResponseDto>), StatusCodes.Status200OK)]

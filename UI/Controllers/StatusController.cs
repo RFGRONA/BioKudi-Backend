@@ -11,6 +11,9 @@ namespace Biokudi_Backend.Controllers
     {
         private readonly ApplicationDbContext _dbContext = dbContext;
 
+        /// <summary>
+        /// Obtiene el estado actual de la aplicación.
+        /// </summary>
         [HttpGet]
         [ProducesResponseType(typeof(StatusDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetStatus()

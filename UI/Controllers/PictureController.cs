@@ -12,6 +12,9 @@ namespace Biokudi_Backend.UI.Controllers
     {
         private readonly IPictureService _pictureService = pictureService;
 
+        /// <summary>
+        /// Obtiene todas las imágenes.
+        /// </summary>
         [HttpGet]
         [ProducesResponseType(typeof(List<PictureResponseDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> Get()
@@ -25,6 +28,10 @@ namespace Biokudi_Backend.UI.Controllers
             return Ok(result.Value);
         }
 
+        /// <summary>
+        /// Elimina una imagen por su ID.
+        /// </summary>
+        /// <param name="id">ID de la imagen a eliminar.</param>
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

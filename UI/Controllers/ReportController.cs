@@ -3,7 +3,6 @@ using Biokudi_Backend.Application.DTOs.Response;
 using Biokudi_Backend.Application.Interfaces;
 using Biokudi_Backend.UI.Helpers;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Biokudi_Backend.UI.Controllers
@@ -15,6 +14,9 @@ namespace Biokudi_Backend.UI.Controllers
     {
         private readonly IAuditService _auditService = auditService;
 
+        /// <summary>
+        /// Obtiene todos los registros de auditoría.
+        /// </summary>
         [HttpGet("Audit")]
         [ProducesResponseType(typeof(List<AuditDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllAuditRecords()
@@ -27,6 +29,9 @@ namespace Biokudi_Backend.UI.Controllers
             return Ok(result.Value);
         }
 
+        /// <summary>
+        /// Obtiene el informe de actividades.
+        /// </summary>
         [HttpGet("Activity")]
         [ProducesResponseType(typeof(AuditReportDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetActivityReport()
@@ -39,6 +44,9 @@ namespace Biokudi_Backend.UI.Controllers
             return Ok(result.Value);
         }
 
+        /// <summary>
+        /// Obtiene el informe de ciudades.
+        /// </summary>
         [HttpGet("City")]
         [ProducesResponseType(typeof(AuditReportDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetCityReport()
@@ -51,6 +59,9 @@ namespace Biokudi_Backend.UI.Controllers
             return Ok(result.Value);
         }
 
+        /// <summary>
+        /// Obtiene el informe de departamentos.
+        /// </summary>
         [HttpGet("Department")]
         [ProducesResponseType(typeof(AuditReportDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetDepartmentReport()
@@ -63,6 +74,9 @@ namespace Biokudi_Backend.UI.Controllers
             return Ok(result.Value);
         }
 
+        /// <summary>
+        /// Obtiene el informe de personas.
+        /// </summary>
         [HttpGet("Person")]
         [ProducesResponseType(typeof(AuditReportDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetPersonReport()
@@ -75,6 +89,9 @@ namespace Biokudi_Backend.UI.Controllers
             return Ok(result.Value);
         }
 
+        /// <summary>
+        /// Obtiene el informe de imágenes.
+        /// </summary>
         [HttpGet("Picture")]
         [ProducesResponseType(typeof(AuditReportDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetPictureReport()
@@ -87,6 +104,9 @@ namespace Biokudi_Backend.UI.Controllers
             return Ok(result.Value);
         }
 
+        /// <summary>
+        /// Obtiene el informe de lugares.
+        /// </summary>
         [HttpGet("Place")]
         [ProducesResponseType(typeof(AuditReportDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetPlaceReport()
@@ -99,6 +119,9 @@ namespace Biokudi_Backend.UI.Controllers
             return Ok(result.Value);
         }
 
+        /// <summary>
+        /// Obtiene el informe de reseñas.
+        /// </summary>
         [HttpGet("Review")]
         [ProducesResponseType(typeof(AuditReportDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetReviewReport()
@@ -111,6 +134,9 @@ namespace Biokudi_Backend.UI.Controllers
             return Ok(result.Value);
         }
 
+        /// <summary>
+        /// Obtiene el informe de roles.
+        /// </summary>
         [HttpGet("Role")]
         [ProducesResponseType(typeof(AuditReportDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetRoleReport()
@@ -123,6 +149,9 @@ namespace Biokudi_Backend.UI.Controllers
             return Ok(result.Value);
         }
 
+        /// <summary>
+        /// Obtiene el informe de estados.
+        /// </summary>
         [HttpGet("State")]
         [ProducesResponseType(typeof(AuditReportDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetStateReport()
@@ -135,6 +164,9 @@ namespace Biokudi_Backend.UI.Controllers
             return Ok(result.Value);
         }
 
+        /// <summary>
+        /// Obtiene el informe de tickets.
+        /// </summary>
         [HttpGet("Ticket")]
         [ProducesResponseType(typeof(AuditReportDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetTicketReport()
@@ -147,6 +179,9 @@ namespace Biokudi_Backend.UI.Controllers
             return Ok(result.Value);
         }
 
+        /// <summary>
+        /// Obtiene el informe de tipos.
+        /// </summary>
         [HttpGet("Type")]
         [ProducesResponseType(typeof(AuditReportDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetTypeReport()
@@ -159,6 +194,10 @@ namespace Biokudi_Backend.UI.Controllers
             return Ok(result.Value);
         }
 
+        /// <summary>
+        /// Envía el informe por correo electrónico.
+        /// </summary>
+        /// <param name="sendReportEmailDto">Datos para enviar el informe.</param>
         [HttpPost("SendByEmail")]
         public IActionResult SendReportByEmail([FromBody] SendReportEmailDto sendReportEmailDto)
         {

@@ -12,6 +12,9 @@ namespace Biokudi_Backend.UI.Controllers
     {
         private readonly IActivityService _activityService = activityService;
 
+        /// <summary>
+        /// Obtiene la lista de actividades.
+        /// </summary>
         [HttpGet]
         [Authorize(Roles = "Admin, Editor")]
         [ProducesResponseType(typeof(List<ActivityDto>), StatusCodes.Status200OK)]
@@ -25,6 +28,10 @@ namespace Biokudi_Backend.UI.Controllers
             return Ok(result.Value);
         }
 
+        /// <summary>
+        /// Obtiene una actividad específica por su ID.
+        /// </summary>
+        /// <param name="id">El ID de la actividad a obtener.</param>
         [HttpGet("{id}")]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(ActivityDto), StatusCodes.Status200OK)]
@@ -38,6 +45,10 @@ namespace Biokudi_Backend.UI.Controllers
             return Ok(result.Value);
         }
 
+        /// <summary>
+        /// Crea una nueva actividad.
+        /// </summary>
+        /// <param name="activity">Datos de la actividad a crear.</param>
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Post([FromBody] ActivityRequestDto activity)
@@ -48,6 +59,11 @@ namespace Biokudi_Backend.UI.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Actualiza los datos de una actividad.
+        /// </summary>
+        /// <param name="id">El ID de la actividad a actualizar.</param>
+        /// <param name="activity">Datos actualizados de la actividad.</param>
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Put(int id, [FromBody] ActivityRequestDto activity)
@@ -58,6 +74,10 @@ namespace Biokudi_Backend.UI.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Elimina una actividad por su ID.
+        /// </summary>
+        /// <param name="id">El ID de la actividad a eliminar.</param>
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
