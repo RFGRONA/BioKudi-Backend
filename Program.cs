@@ -40,6 +40,11 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseReDoc(c =>
+    {
+        c.Path = "/redoc";
+        c.DocumentPath = "/swagger/v1/swagger.json";
+    });
 }
 
 app.UseHttpsRedirection();
@@ -50,7 +55,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseCors("AllAllowed");
+app.UseCors("OnlyFrontend");
 app.UseSerilogRequestLogging();
 app.UseAuthentication();
 app.UseTokenRenewal();

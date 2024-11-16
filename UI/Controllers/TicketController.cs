@@ -12,6 +12,9 @@ namespace Biokudi_Backend.UI.Controllers
     {
         private readonly ITicketService _ticketService = ticketService;
 
+        /// <summary>
+        /// Obtiene una lista de todos los tickets.
+        /// </summary>
         [HttpGet]
         [Authorize(Roles = "Admin, Editor")]
         [ProducesResponseType(typeof(List<TicketResponseDto>), StatusCodes.Status200OK)]
@@ -27,6 +30,10 @@ namespace Biokudi_Backend.UI.Controllers
             return Ok(result.Value);
         }
 
+        /// <summary>
+        /// Obtiene un ticket específico por su ID.
+        /// </summary>
+        /// <param name="id">El ID del ticket a obtener.</param>
         [HttpGet("{id}")]
         [Authorize(Roles = "Admin, Editor")]
         [ProducesResponseType(typeof(TicketResponseDto), StatusCodes.Status200OK)]
@@ -36,6 +43,10 @@ namespace Biokudi_Backend.UI.Controllers
             return result.IsSuccess ? Ok(result.Value) : NotFound(result.ErrorMessage);
         }
 
+        /// <summary>
+        /// Crea un nuevo ticket.
+        /// </summary>
+        /// <param name="ticketRequest">Los datos del ticket a crear.</param>
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] TicketCreateRequestDto ticketRequest)
         {
@@ -43,6 +54,11 @@ namespace Biokudi_Backend.UI.Controllers
             return result.IsSuccess ? Ok() : BadRequest(result.ErrorMessage);
         }
 
+        /// <summary>
+        /// Actualiza un ticket existente.
+        /// </summary>
+        /// <param name="id">El ID del ticket a actualizar.</param>
+        /// <param name="ticketRequest">Los nuevos datos del ticket.</param>
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin, Editor")]
         public async Task<IActionResult> Put(int id, [FromBody] TicketUpdateRequestDto ticketRequest)
@@ -51,6 +67,11 @@ namespace Biokudi_Backend.UI.Controllers
             return result.IsSuccess ? Ok() : BadRequest(result.ErrorMessage);
         }
 
+        /// <summary>
+        /// Escala un ticket a otro nivel.
+        /// </summary>
+        /// <param name="id">El ID del ticket a escalar.</param>
+        /// <param name="scalpTicket">Información para escalar el ticket.</param>
         [HttpPut("Scalp/{id}")]
         [Authorize(Roles = "Admin, Editor")]
         public async Task<IActionResult> Scalp(int id, [FromBody] ScalpTicketRequestDto scalpTicket)
@@ -59,6 +80,10 @@ namespace Biokudi_Backend.UI.Controllers
             return result.IsSuccess ? Ok() : BadRequest(result.ErrorMessage);
         }
 
+        /// <summary>
+        /// Elimina un ticket por su ID.
+        /// </summary>
+        /// <param name="id">El ID del ticket a eliminar.</param>
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)

@@ -38,6 +38,7 @@ namespace Biokudi_Backend.Application.Mappings
                 DateModified = entity.DateModified?.ToString("yyyy-MM-dd") ?? string.Empty,
                 PersonId = entity.PersonId,
                 PersonName = entity.Person.NameUser,
+                PersonEmail = entity.Person.Email,
                 PlaceId = entity.PlaceId,
                 PlaceName = entity.Place.NamePlace 
             };
@@ -52,7 +53,8 @@ namespace Biokudi_Backend.Application.Mappings
                 Comment = entity.Comment,
                 DateCreated = entity.DateCreated.ToString("yyyy-MM-dd"),
                 DateModified = entity.DateModified?.ToString("yyyy-MM-dd") ?? string.Empty,
-                PersonName = entity.Person.NameUser
+                PersonName = entity.Person.NameUser,
+                PersonId = entity.PersonId
             };
         }
     }

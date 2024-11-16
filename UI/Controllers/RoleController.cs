@@ -1,9 +1,7 @@
 ﻿using Biokudi_Backend.Application.DTOs;
-using Biokudi_Backend.Application.DTOs.Response;
 using Biokudi_Backend.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
 
 namespace Biokudi_Backend.UI.Controllers
 {
@@ -14,6 +12,9 @@ namespace Biokudi_Backend.UI.Controllers
     {
         private readonly IRoleService _roleService = roleService;
 
+        /// <summary>
+        /// Obtiene una lista de todos los roles.
+        /// </summary>
         [HttpGet]
         [ProducesResponseType(typeof(List<RoleDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> Get()
@@ -28,6 +29,10 @@ namespace Biokudi_Backend.UI.Controllers
             return Ok(result.Value);
         }
 
+        /// <summary>
+        /// Obtiene un rol específico por su ID.
+        /// </summary>
+        /// <param name="id">El ID del rol a obtener.</param>
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(RoleDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> Get(int id)
@@ -36,6 +41,10 @@ namespace Biokudi_Backend.UI.Controllers
             return result.IsSuccess ? Ok(result.Value) : NotFound(result.ErrorMessage);
         }
 
+        /// <summary>
+        /// Crea un nuevo rol.
+        /// </summary>
+        /// <param name="role">Los datos del rol a crear.</param>
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] RoleRequestDto role)
         {
@@ -46,6 +55,11 @@ namespace Biokudi_Backend.UI.Controllers
             return result.IsSuccess ? Ok() : BadRequest(result.ErrorMessage);
         }
 
+        /// <summary>
+        /// Actualiza un rol existente.
+        /// </summary>
+        /// <param name="id">El ID del rol a actualizar.</param>
+        /// <param name="role">Los nuevos datos del rol.</param>
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] RoleRequestDto role)
         {
@@ -56,6 +70,10 @@ namespace Biokudi_Backend.UI.Controllers
             return result.IsSuccess ? Ok() : BadRequest(result.ErrorMessage);
         }
 
+        /// <summary>
+        /// Elimina un rol por su ID.
+        /// </summary>
+        /// <param name="id">El ID del rol a eliminar.</param>
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

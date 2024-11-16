@@ -6,11 +6,14 @@ using System.Reflection;
 namespace Biokudi_Backend.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     public class StatusController(ApplicationDbContext dbContext) : ControllerBase
     {
         private readonly ApplicationDbContext _dbContext = dbContext;
 
+        /// <summary>
+        /// Obtiene el estado actual de la aplicación.
+        /// </summary>
         [HttpGet]
         [ProducesResponseType(typeof(StatusDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetStatus()

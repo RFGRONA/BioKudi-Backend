@@ -1,5 +1,4 @@
 ﻿using Biokudi_Backend.Application.DTOs;
-using Biokudi_Backend.Application.DTOs.Response;
 using Biokudi_Backend.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,6 +11,9 @@ namespace Biokudi_Backend.UI.Controllers
     {
         private readonly IDepartmentService _departmentService = _departmentService;
 
+        /// <summary>
+        /// Obtiene la lista de departamentos.
+        /// </summary>
         [HttpGet]
         [Authorize(Roles = "Admin, Editor")]
         [ProducesResponseType(typeof(List<DepartmentDto>), StatusCodes.Status200OK)]
@@ -25,6 +27,10 @@ namespace Biokudi_Backend.UI.Controllers
             return Ok(result.Value);
         }
 
+        /// <summary>
+        /// Obtiene un departamento específico por su ID.
+        /// </summary>
+        /// <param name="id">El ID del departamento a obtener.</param>
         [HttpGet("{id}")]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(DepartmentDto), StatusCodes.Status200OK)]
@@ -38,6 +44,10 @@ namespace Biokudi_Backend.UI.Controllers
             return Ok(result.Value);
         }
 
+        /// <summary>
+        /// Crea un nuevo departamento.
+        /// </summary>
+        /// <param name="department">Datos del departamento a crear.</param>
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Post([FromBody] DepartmentRequestDto department)
@@ -48,6 +58,11 @@ namespace Biokudi_Backend.UI.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Actualiza los datos de un departamento.
+        /// </summary>
+        /// <param name="id">El ID del departamento a actualizar.</param>
+        /// <param name="department">Datos actualizados del departamento.</param>
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Put(int id, [FromBody] DepartmentRequestDto department)
@@ -58,6 +73,10 @@ namespace Biokudi_Backend.UI.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Elimina un departamento por su ID.
+        /// </summary>
+        /// <param name="id">El ID del departamento a eliminar.</param>
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)

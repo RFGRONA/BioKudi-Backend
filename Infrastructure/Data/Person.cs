@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Biokudi_Backend.Infrastructure;
+namespace Biokudi_Backend.Infrastructure.Data;
 
 public partial class Person
 {
@@ -18,8 +18,6 @@ public partial class Person
     public DateTime? DateModified { get; set; }
 
     public string Password { get; set; } = null!;
-
-    public string Hash { get; set; } = null!;
 
     public int? StateId { get; set; }
 

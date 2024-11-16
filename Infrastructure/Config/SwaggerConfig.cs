@@ -1,5 +1,8 @@
 ﻿using Biokudi_Backend.Infrastructure.Services;
+using Microsoft.OpenApi.Any;
+using Microsoft.OpenApi.Interfaces;
 using Microsoft.OpenApi.Models;
+using System.Reflection;
 
 namespace Biokudi_Backend.Infrastructure.Config
 {
@@ -13,40 +16,37 @@ namespace Biokudi_Backend.Infrastructure.Config
                 {
                     Title = "Biokudi API",
                     Version = "v1",
-                    Description = "Gestión y validación de datos."
-                });
-
-                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                {
-                    Description = "JWT Token usar Bearer {token}",
-                    Name = "Authorization",
-                    In = ParameterLocation.Header,
-                    Type = SecuritySchemeType.ApiKey,
-                    Scheme = "Bearer"
-                });
-
-                options.AddSecurityRequirement(new OpenApiSecurityRequirement
-                {
+                    Description = "Gestión y validación de datos. Para más detalles, consulta la [documentación completa en GitHub](https://github.com/RFGRONA/BioKudi-Backend/wiki/).",
+                    Contact = new OpenApiContact
                     {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = "Bearer"
-                            },
-                            Scheme = "Bearer",
-                            Name = "Bearer",
-                            In = ParameterLocation.Header
-                        },
-                        new List<string>()
+                        Name = "Equipo de Soporte Biokudi",
+                        Email = "contacto@biokudi.com",
+                        Url = new Uri("https://biokudi.site/help")
+                    },
+                    TermsOfService = new Uri("https://biokudi.site/privacy-policy"),
+                    Extensions = new Dictionary<string, IOpenApiExtension>
+                    {
+                        { "x-documentation-url", new OpenApiString("https://github.com/RFGRONA/BioKudi-Backend/wiki/") }
                     }
                 });
+
+                options.AddSecurityDefinition("cookieAuth", new OpenApiSecurityScheme
+                {
+                    Name = "Cookie",
+                    Type = SecuritySchemeType.ApiKey,
+                    In = ParameterLocation.Cookie,
+                    Description = "Autenticación mediante cookies. Debe iniciar sesión y enviar una solicitud con la cookie de autenticación válida."
+                });
+
 
                 options.OperationFilter<ProducesResponseTypeFilter>();
                 options.OperationFilter<UnauthorizedResponseFilter>();
                 options.OperationFilter<ProducesJsonFilter>();
+                options.OperationFilter<AuthOperationFilter>();
 
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                options.IncludeXmlComments(xmlPath);
             });
         }
     }
