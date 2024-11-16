@@ -141,27 +141,53 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                 if (existingUser == null)
                     return Result<bool>.Failure("Usuario no encontrado.");
 
-                existingUser.NameUser = user.NameUser != null && user.NameUser != existingUser.NameUser ? user.NameUser : existingUser.NameUser;
-                existingUser.Email = user.Email.ToLower() != null && user.Email.ToLower() != existingUser.Email.ToLower() ? user.Email.ToLower() : existingUser.Email.ToLower();
-                existingUser.RoleId = user.RoleId != 0 && user.RoleId != existingUser.RoleId ? user.RoleId : existingUser.RoleId;
-                existingUser.StateId = user.StateId != null && user.StateId != existingUser.StateId ? user.StateId : existingUser.StateId;
-                existingUser.Telephone = user.Telephone != null && user.Telephone != existingUser.Telephone ? user.Telephone : existingUser.Telephone;
-                existingUser.EmailNotification = user.EmailNotification != null && user.EmailNotification != existingUser.EmailNotification ? user.EmailNotification : existingUser.EmailNotification;
-                existingUser.EmailPost = user.EmailPost != null && user.EmailPost != existingUser.EmailPost ? user.EmailPost : existingUser.EmailPost;
-                existingUser.EmailList = user.EmailList != null && user.EmailList != existingUser.EmailList ? user.EmailList : existingUser.EmailList;
+                existingUser.NameUser = !string.IsNullOrEmpty(user.NameUser) && user.NameUser != existingUser.NameUser
+                    ? user.NameUser
+                    : existingUser.NameUser;
+
+                existingUser.Email = !string.IsNullOrEmpty(user.Email) &&
+                                     user.Email.ToLower() != existingUser.Email?.ToLower()
+                    ? user.Email.ToLower()
+                    : existingUser.Email;
+
+                existingUser.RoleId = user.RoleId != 0 && user.RoleId != existingUser.RoleId
+                    ? user.RoleId
+                    : existingUser.RoleId;
+
+                existingUser.StateId = user.StateId != null && user.StateId != existingUser.StateId
+                    ? user.StateId
+                    : existingUser.StateId;
+
+                existingUser.Telephone = !string.IsNullOrEmpty(user.Telephone) && user.Telephone != existingUser.Telephone
+                    ? user.Telephone
+                    : existingUser.Telephone;
+
+                existingUser.EmailNotification = user.EmailNotification != null && user.EmailNotification != existingUser.EmailNotification 
+                    ? user.EmailNotification 
+                    : existingUser.EmailNotification;
+
+                existingUser.EmailPost = user.EmailPost != null && user.EmailPost != existingUser.EmailPost 
+                    ? user.EmailPost 
+                    : existingUser.EmailPost;
+
+                existingUser.EmailList = user.EmailList != null && user.EmailList != existingUser.EmailList 
+                    ? user.EmailList 
+                    : existingUser.EmailList;
 
                 existingUser.DateModified = DateUtility.DateNowColombia();
-
                 _context.People.Update(existingUser);
                 int rowsAffected = await _context.SaveChangesAsync();
 
-                return rowsAffected > 0 ? Result<bool>.Success(true) : Result<bool>.Failure("Error al actualizar el usuario.");
+                return rowsAffected > 0
+                    ? Result<bool>.Success(true)
+                    : Result<bool>.Failure("Error al actualizar el usuario.");
             }
             catch (Exception ex)
             {
                 return Result<bool>.Failure($"Error al actualizar el usuario: {ex.Message}");
             }
         }
+
 
         public async Task<Result<bool>> Delete(int id)
         {
