@@ -9,6 +9,7 @@
         public string DateModified { get; set; } 
         public int PersonId { get; set; }
         public string PersonName { get; set; } 
+        public string PersonEmail { get; set; }
         public int PlaceId { get; set; }
         public string PlaceName { get; set; } 
     }

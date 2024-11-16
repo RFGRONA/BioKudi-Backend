@@ -105,6 +105,9 @@ namespace Biokudi_Backend.Infrastructure.Repositories
             {
                 var ticket = await _context.Tickets
                     .AsNoTracking()
+                    .Include(t => t.Person)  
+                    .Include(t => t.State)   
+                    .Include(t => t.Type)
                     .FirstOrDefaultAsync(t => t.IdTicket == id);
 
                 if (ticket == null)

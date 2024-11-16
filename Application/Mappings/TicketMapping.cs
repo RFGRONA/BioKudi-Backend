@@ -11,7 +11,8 @@ namespace Biokudi_Backend.Application.Mappings
             return new TicketEntity
             {
                 Affair = requestDto.Affair,
-                PersonId = requestDto.PersonId
+                PersonId = requestDto.PersonId,
+                TypeId = requestDto.TypeId
             };
         }
 
@@ -21,7 +22,6 @@ namespace Biokudi_Backend.Application.Mappings
             {
                 IdTicket = ticketId,
                 AnsweredBy = requestDto.AnsweredBy,
-                StateId = requestDto.StateId
             };
         }
 
@@ -45,8 +45,11 @@ namespace Biokudi_Backend.Application.Mappings
                 AnsweredBy = entity.AnsweredBy,
                 ScalpAdmin = entity.ScalpAdmin,
                 PersonId = entity.PersonId,
-                PersonName = entity.Person?.NameUser, 
+                PersonName = entity.Person?.NameUser,
+                PersonEmail = entity.Person?.Email,
+                StateName = entity.State?.NameState,
                 StateId = entity.StateId,
+                TypeName = entity.Type?.NameType,
                 TypeId = entity.TypeId
             };
         }

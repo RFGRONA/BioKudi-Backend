@@ -15,5 +15,8 @@ namespace Biokudi_Backend.Application.Interfaces
         Task<Result<bool>> UpdateCrudUser(int id, PersonCrudRequestDto person);
         Task<Result<bool>> UpdateUserProfile(int id, PersonRequestDto person);
         Task<Result<bool>> DeleteUser(int id);
+        Task<Result<bool>> GeneratePasswordResetToken(string email);
+        Task<Result<bool>> VerifyAndResetPassword(ResetPasswordRequestDto request);
+        Task<Result<bool>> UpdatePassword(int userId, UpdatePasswordRequestDto request);
     }
 }

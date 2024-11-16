@@ -1,9 +1,7 @@
 ﻿using Biokudi_Backend.Application.DTOs;
-using Biokudi_Backend.Application.DTOs.Response;
 using Biokudi_Backend.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 
 namespace Biokudi_Backend.UI.Controllers
 {
@@ -14,6 +12,9 @@ namespace Biokudi_Backend.UI.Controllers
     {
         private readonly ITableRelationService _tableRelationService = tableRelationService;
 
+        /// <summary>
+        /// Obtiene todas las relaciones de tablas.
+        /// </summary>
         [HttpGet]
         [ProducesResponseType(typeof(TableRelationDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> Get()

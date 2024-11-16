@@ -7,6 +7,10 @@
     <RootNamespace>Biokudi_Backend</RootNamespace>
     <UserSecretsId>a8c5335d-857e-4a9d-81c7-fe7650b6ea4c</UserSecretsId>
   </PropertyGroup>
+	<PropertyGroup>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<NoWarn>$(NoWarn);1591</NoWarn>
+	</PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />

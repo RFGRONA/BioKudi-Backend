@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Biokudi_Backend.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
 namespace Biokudi_Backend.Infrastructure.Data;
@@ -222,9 +221,6 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.EmailPost)
                 .HasDefaultValue(true)
                 .HasColumnName("email_post");
-            entity.Property(e => e.Hash)
-                .HasMaxLength(255)
-                .HasColumnName("hash");
             entity.Property(e => e.NameUser)
                 .HasMaxLength(65)
                 .HasColumnName("name_user");

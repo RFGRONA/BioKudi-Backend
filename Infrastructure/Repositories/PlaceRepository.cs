@@ -205,16 +205,12 @@ namespace Biokudi_Backend.Infrastructure.Repositories
 
             try
             {
-                var cachedPlaces = _cacheService.GetCollection<PlaceEntity>(CACHE_KEY);
-                var cachedPlace = cachedPlaces?.FirstOrDefault(p => p.IdPlace == id);
-                if (cachedPlace != null)
-                    return Result<PlaceEntity>.Success(cachedPlace);
-
                 var result = await _context.Places
                     .AsNoTracking()
                     .Include(p => p.Activities)
                     .Include(p => p.Pictures)
                     .Include(p => p.Reviews)
+                    .ThenInclude(r => r.Person)
                     .Include(p => p.City)
                     .Include(p => p.State)
                     .FirstOrDefaultAsync(p => p.IdPlace == id);
@@ -342,25 +338,82 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                 return Result<bool>.Failure($"Error al actualizar el lugar: {ex.Message}");
             }
         }
-
-        public Task<IEnumerable<PlaceEntity>?> GetPlacesByActivity(int activityId)
+        public async Task<Result<IEnumerable<PlaceEntity>>> SearchPlaces(string place)
         {
-            throw new NotImplementedException();
-        }
+            if (_context == null)
+                return Result<IEnumerable<PlaceEntity>>.Failure("Error al iniciar el contexto con la base de datos");
 
-        public Task<IEnumerable<PlaceEntity>?> GetPlacesByCity(int cityId)
-        {
-            throw new NotImplementedException();
-        }
+            try
+            {
+                var allCachedPlaces = _cacheService.GetCollection<PlaceEntity>(CACHE_KEY);
+                IEnumerable<PlaceEntity> filteredPlaces;
 
-        public Task<IEnumerable<PlaceEntity>?> GetPlacesByDateCreated(DateTime date)
-        {
-            throw new NotImplementedException();
-        }
+                if (allCachedPlaces != null)
+                {
+                    string lowerCasePlace = place.ToLower();
+                    filteredPlaces = [.. allCachedPlaces
+                .Where(p => p.NamePlace.ToLower().Contains(lowerCasePlace))
+                .OrderBy(p => !p.NamePlace.ToLower().StartsWith(lowerCasePlace))
+                .ThenBy(p => p.NamePlace)];
+                }
+                else
+                {
+                    string lowerCasePlace = place.ToLower();
+                    var places = await _context.Places
+                        .AsNoTracking()
+                        .Include(p => p.Activities)
+                        .Include(p => p.Pictures)
+                        .Include(p => p.Reviews)
+                        .Include(p => p.City)
+                        .Include(p => p.State)
+                        .Where(p => p.NamePlace.ToLower().Contains(lowerCasePlace))
+                        .ToListAsync();
 
-        public Task<IEnumerable<PlaceEntity>?> GetPlacesByState(int stateId)
-        {
-            throw new NotImplementedException();
+                    filteredPlaces = [.. places.Select(result => new PlaceEntity
+            {
+                IdPlace = result.IdPlace,
+                NamePlace = result.NamePlace,
+                Latitude = result.Latitude,
+                Longitude = result.Longitude,
+                Address = result.Address,
+                Description = result.Description,
+                Link = result.Link,
+                DateCreated = result.DateCreated,
+                DateModified = result.DateModified,
+                City = result.City != null ? new CatCityEntity
+                {
+                    IdCity = result.City.IdCity,
+                    NameCity = result.City.NameCity ?? string.Empty
+                } : null,
+                State = result.State != null ? new CatStateEntity
+                {
+                    IdState = result.State.IdState,
+                    NameState = result.State.NameState
+                } : null,
+                Activities = result.Activities?.Select(a => new CatActivityEntity
+                {
+                    IdActivity = a.IdActivity,
+                    NameActivity = a.NameActivity,
+                    UrlIcon = a.UrlIcon ?? string.Empty
+                }).ToList() ?? [],
+                Pictures = result.Pictures?.Select(pic => new PictureEntity
+                {
+                    IdPicture = pic.IdPicture,
+                    Name = pic.Name,
+                    Link = pic.Link
+                }).ToList() ?? [],
+                Rating = result.Reviews?.Any() == true ? result.Reviews.Average(r => (double)r.Rate) : 0
+            })
+            .OrderBy(p => !p.NamePlace.ToLower().StartsWith(lowerCasePlace))
+            .ThenBy(p => p.NamePlace)];
+                }
+
+                return Result<IEnumerable<PlaceEntity>>.Success(filteredPlaces);
+            }
+            catch (Exception ex)
+            {
+                return Result<IEnumerable<PlaceEntity>>.Failure($"Error al buscar lugares: {ex.Message}");
+            }
         }
     }
 }

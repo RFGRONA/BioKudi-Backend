@@ -2,15 +2,17 @@
 using Biokudi_Backend.Application.DTOs.Response;
 using Biokudi_Backend.Application.Interfaces;
 using Biokudi_Backend.Application.Mappings;
+using Biokudi_Backend.Application.Utilities;
 using Biokudi_Backend.Domain.Interfaces;
 using Biokudi_Backend.Domain.ValueObject;
 
 namespace Biokudi_Backend.Application.Services
 {
-    public class ReviewService(IReviewRepository reviewRepository, ReviewMapping reviewMapping) : IReviewService
+    public class ReviewService(IReviewRepository reviewRepository, ReviewMapping reviewMapping, EmailUtility emailUtility) : IReviewService
     {
         private readonly IReviewRepository _reviewRepository = reviewRepository;
         private readonly ReviewMapping _reviewMapping = reviewMapping;
+        private readonly EmailUtility _emailUtility = emailUtility;
 
         public async Task<Result<ReviewResponseDto>> CreateReview(CreateReviewRequestDto dto)
         {
@@ -66,6 +68,15 @@ namespace Biokudi_Backend.Application.Services
             return result.IsSuccess && result.Value.Any()
                 ? Result<IEnumerable<ReviewMapResponseDto>>.Success(result.Value.Select(_reviewMapping.ToReviewMapDto))
                 : Result<IEnumerable<ReviewMapResponseDto>>.Failure(result.ErrorMessage ?? "No se encontraron reseñas para este lugar.");
+        }
+
+        public async Task<Result<bool>> DeleteReviewByAdmin(int id, ReviewDeleteByAdminDto dto)
+        {
+            var result = await _reviewRepository.Delete(id);
+            _emailUtility.SendEmail(dto.PersonEmail, "Notificación Reseña eliminada", _emailUtility.DeleteReviewByAdminEmail(dto.Comment, dto.Reason));
+            return result.IsSuccess
+                ? Result<bool>.Success(true)
+                : Result<bool>.Failure(result.ErrorMessage);
         }
     }
 }

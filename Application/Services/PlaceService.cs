@@ -115,5 +115,32 @@ namespace Biokudi_Backend.Application.Services
             var result = await _placeRepository.Update(entity);
             return result.IsSuccess ? Result<bool>.Success(true) : Result<bool>.Failure(result.ErrorMessage);
         }
+
+        public async Task<Result<List<PlaceListActivityDto>>> SearchPlaces(PlaceSearchRequestDto request)
+        {
+            var result = await _placeRepository.SearchPlaces(request.Search);
+            if (result.IsSuccess)
+            {
+                var places = result.Value
+                    .Select(p => _placeMapping.MapToPlaceListActivityDto(p))
+                    .ToList();
+
+                return Result<List<PlaceListActivityDto>>.Success(places);
+            }
+            return Result<List<PlaceListActivityDto>>.Failure(result.ErrorMessage);
+        }
+
+        public async Task<Result<MapPlaceIdResponseDto>> GetMapRandomPlace()
+        {
+            var allPlacesResult = await _placeRepository.GetAll();
+
+            if (!allPlacesResult.IsSuccess || !allPlacesResult.Value.Any())
+                return Result<MapPlaceIdResponseDto>.Failure(allPlacesResult.ErrorMessage ?? "No hay lugares disponibles.");
+
+            var random = new Random();
+            var randomPlace = allPlacesResult.Value.ElementAt(random.Next(allPlacesResult.Value.Count()));
+            var mapPlaceIdResponseDto = new MapPlaceIdResponseDto { IdPlace = randomPlace.IdPlace};
+            return Result<MapPlaceIdResponseDto>.Success(mapPlaceIdResponseDto);
+        }
     }
 }

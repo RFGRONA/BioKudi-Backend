@@ -9,6 +9,7 @@ namespace Biokudi_Backend.Application.Interfaces
         Task<Result<ReviewResponseDto>> CreateReview(CreateReviewRequestDto dto);
         Task<Result<bool>> UpdateReview(int id, UpdateReviewRequestDto dto);
         Task<Result<bool>> DeleteReview(int id);
+        Task<Result<bool>> DeleteReviewByAdmin(int id, ReviewDeleteByAdminDto dto);
         Task<Result<ReviewResponseDto>> GetReviewById(int id);
         Task<Result<IEnumerable<ReviewResponseDto>>> GetAllReviews();
         Task<Result<IEnumerable<ReviewMapResponseDto>>> GetReviewsByPlaceId(int placeId);
