@@ -110,6 +110,7 @@ namespace Biokudi_Backend.Application.Services
 
         public async Task<Result<bool>> GeneratePasswordResetToken(string email)
         {
+            email = email.ToLower();
             var result = await _personRepository.GetAccountByEmail(email);
             if (!result.IsSuccess || result.Value == null)
                 return Result<bool>.Failure("Correo no registrado.");
@@ -123,6 +124,7 @@ namespace Biokudi_Backend.Application.Services
 
         public async Task<Result<bool>> VerifyAndResetPassword(ResetPasswordRequestDto request)
         {
+            request.Email = request.Email.ToLower();
             if (!_jwtUtility.ValidateJwtToken(request.Token, request.Email))
                 return Result<bool>.Failure("Token inválido o expirado.");
 

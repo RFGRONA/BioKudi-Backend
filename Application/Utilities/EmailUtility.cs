@@ -9,6 +9,7 @@ namespace Biokudi_Backend.Application.Utilities
     {
         private readonly SmtpClient client;
         private readonly string User;
+        private readonly string From;
         private readonly bool EnabledSSL = true;
 
         public EmailUtility(IConfiguration configuration)
@@ -19,6 +20,7 @@ namespace Biokudi_Backend.Application.Utilities
             Host = configuration["Smtp:Host"] ?? throw new ArgumentNullException(nameof(configuration), "Smtp:Host is null");
             Port = int.Parse(configuration["Smtp:Port"] ?? throw new ArgumentNullException(nameof(configuration), "Smtp:Port is null"));
             User = configuration["Smtp:User"] ?? throw new ArgumentNullException(nameof(configuration), "Smtp:User is null");
+            From = configuration["Smtp:From"] ?? throw new ArgumentNullException(nameof(configuration), "Smtp:From is null");
             Password = configuration["Smtp:Password"] ?? throw new ArgumentNullException(nameof(configuration), "Smtp:Password is null");
 
             client = new SmtpClient(Host, Port)
@@ -35,9 +37,14 @@ namespace Biokudi_Backend.Application.Utilities
             MailMessage email;
             try
             {
-                if(!EmailValidatorUtility.ValidateEmailAsync(destiny).Result) throw new Exception("Invalid email");
-                email = new MailMessage(User, destiny, affair, message);
-                email.IsBodyHtml = true;
+                email = new MailMessage
+                {
+                    From = new MailAddress(From, "Biokudi"),
+                    Subject = affair,
+                    Body = message,
+                    IsBodyHtml = true
+                };
+                email.To.Add(destiny);
                 client.Send(email);
             }
             catch (Exception ex)

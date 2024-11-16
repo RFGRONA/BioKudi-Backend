@@ -15,14 +15,14 @@ namespace Biokudi_Backend.Infrastructure.Repositories
         {
             try
             {
-                var existingUser = await _context.People.FirstOrDefaultAsync(u => u.Email == user.Email);
+                var existingUser = await _context.People.FirstOrDefaultAsync(u => u.Email.ToLower() == user.Email.ToLower());
                 if (existingUser != null)
                     return Result<PersonEntity>.Failure("El correo ya se encuentra registrado.");
 
                 var person = new Person
                 {
                     NameUser = user.NameUser,
-                    Email = user.Email,
+                    Email = user.Email.ToLower(),
                     Password = user.Password,
                     RoleId = user.RoleId,
                     StateId = user.StateId,
@@ -56,7 +56,7 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                 var result = await _context.People
                     .AsNoTracking()
                     .Include(p => p.Role)
-                    .FirstOrDefaultAsync(u => u.Email == email);
+                    .FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
                 if (result == null)
                     return Result<PersonEntity>.Failure("Correo no encontrado.");
 
@@ -64,7 +64,7 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                 {
                     IdUser = result.IdUser,
                     NameUser = result.NameUser,
-                    Email = result.Email,
+                    Email = result.Email.ToLower(),
                     Password = result.Password,
                     RoleId = result.RoleId,
                     StateId = result.StateId,
@@ -104,7 +104,8 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                 {
                     IdUser = result.IdUser,
                     NameUser = result.NameUser,
-                    Email = result.Email,
+                    Password = result.Password,
+                    Email = result.Email.ToLower(),
                     RoleId = result.RoleId,
                     StateId = result.StateId,
                     Telephone = result.Telephone,
@@ -141,7 +142,7 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                     return Result<bool>.Failure("Usuario no encontrado.");
 
                 existingUser.NameUser = user.NameUser != null && user.NameUser != existingUser.NameUser ? user.NameUser : existingUser.NameUser;
-                existingUser.Email = user.Email != null && user.Email != existingUser.Email ? user.Email : existingUser.Email;
+                existingUser.Email = user.Email.ToLower() != null && user.Email.ToLower() != existingUser.Email.ToLower() ? user.Email.ToLower() : existingUser.Email.ToLower();
                 existingUser.RoleId = user.RoleId != 0 && user.RoleId != existingUser.RoleId ? user.RoleId : existingUser.RoleId;
                 existingUser.StateId = user.StateId != null && user.StateId != existingUser.StateId ? user.StateId : existingUser.StateId;
                 existingUser.Telephone = user.Telephone != null && user.Telephone != existingUser.Telephone ? user.Telephone : existingUser.Telephone;
@@ -194,7 +195,7 @@ namespace Biokudi_Backend.Infrastructure.Repositories
                 {
                     IdUser = p.IdUser,
                     NameUser = p.NameUser,
-                    Email = p.Email,
+                    Email = p.Email.ToLower(),
                     RoleId = p.RoleId,
                     StateId = p.StateId,
                     Telephone = p.Telephone,

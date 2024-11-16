@@ -53,7 +53,8 @@ namespace Biokudi_Backend.Application.Mappings
                 Comment = entity.Comment,
                 DateCreated = entity.DateCreated.ToString("yyyy-MM-dd"),
                 DateModified = entity.DateModified?.ToString("yyyy-MM-dd") ?? string.Empty,
-                PersonName = entity.Person.NameUser
+                PersonName = entity.Person.NameUser,
+                PersonId = entity.PersonId
             };
         }
     }

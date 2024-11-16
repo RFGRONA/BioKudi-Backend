@@ -205,16 +205,12 @@ namespace Biokudi_Backend.Infrastructure.Repositories
 
             try
             {
-                var cachedPlaces = _cacheService.GetCollection<PlaceEntity>(CACHE_KEY);
-                var cachedPlace = cachedPlaces?.FirstOrDefault(p => p.IdPlace == id);
-                if (cachedPlace != null)
-                    return Result<PlaceEntity>.Success(cachedPlace);
-
                 var result = await _context.Places
                     .AsNoTracking()
                     .Include(p => p.Activities)
                     .Include(p => p.Pictures)
                     .Include(p => p.Reviews)
+                    .ThenInclude(r => r.Person)
                     .Include(p => p.City)
                     .Include(p => p.State)
                     .FirstOrDefaultAsync(p => p.IdPlace == id);

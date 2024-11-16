@@ -27,7 +27,7 @@ namespace Biokudi_Backend.Application.Mappings
             return new StartCarrouselDto
             {
                 name = place.NamePlace,
-                rating = place.Rating,
+                rating = Math.Round(place.Rating, 1),
                 url = place.Pictures.FirstOrDefault()?.Link
                       ?? DefaultImages[Random.Next(DefaultImages.Length)]
             };
@@ -108,8 +108,10 @@ namespace Biokudi_Backend.Application.Mappings
                         Rate = r.Rate,
                         DateCreated = r.DateCreated.ToString("yyyy-MM-dd"),
                         DateModified = r.DateModified?.ToString("yyyy-MM-dd") ?? string.Empty,
-                        PersonName = r.Person?.NameUser ?? "Anonymous"
+                        PersonName = r.Person?.NameUser ?? "Anonymous",
+                        PersonId = r.PersonId
                     }).ToList(),
+                Rating = Math.Round(place.Rating, 1)
             };
         }
 
@@ -153,7 +155,7 @@ namespace Biokudi_Backend.Application.Mappings
                 Description = place.Description,
                 Image = place.Pictures.FirstOrDefault()?.Link
                       ?? DefaultImages[Random.Next(DefaultImages.Length)],
-                Rating = place.Rating,
+                Rating = Math.Round(place.Rating, 1),
                 Activities = place.Activities.Select(a => new ActivityDto
                 {
                     IdActivity = a.IdActivity,
@@ -173,7 +175,7 @@ namespace Biokudi_Backend.Application.Mappings
                 Description = place.Description,
                 Address = place.Address,
                 Link = place.Link,
-                Rating = place.Rating,
+                Rating = Math.Round(place.Rating, 1),
                 Latitude = place.Latitude,
                 Longitude = place.Longitude
             };

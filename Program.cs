@@ -55,7 +55,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseCors("AllAllowed");
+app.UseCors("OnlyFrontend");
 app.UseSerilogRequestLogging();
 app.UseAuthentication();
 app.UseTokenRenewal();

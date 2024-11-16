@@ -8,5 +8,6 @@
         public string DateCreated { get; set; }
         public string DateModified { get; set; }
         public string PersonName { get; set; }
+        public int PersonId { get; set; }
     }
 }

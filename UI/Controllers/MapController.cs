@@ -17,7 +17,6 @@ namespace Biokudi_Backend.UI.Controllers
         /// </summary>
         [HttpGet]
         [Route("Points")]
-        [OutputCache(Duration = 300)]
         [ProducesResponseType(typeof(List<PlaceListPointMapDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> Points()
         {
@@ -30,7 +29,6 @@ namespace Biokudi_Backend.UI.Controllers
         /// </summary>
         /// <param name="id">ID del lugar en el mapa.</param>
         [HttpGet("Place/{id}")]
-        [OutputCache(Duration = 60)]
         [ProducesResponseType(typeof(PlaceMapDetailResponseDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetMapPlaceById(int id)
         {
@@ -43,7 +41,6 @@ namespace Biokudi_Backend.UI.Controllers
         /// </summary>
         /// <param name="id">ID del lugar para obtener reseñas.</param>
         [HttpGet("Reviews/{id}")]
-        [OutputCache(Duration = 60)]
         [ProducesResponseType(typeof(List<ReviewMapResponseDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetReviewsPlaceById(int id)
         {
