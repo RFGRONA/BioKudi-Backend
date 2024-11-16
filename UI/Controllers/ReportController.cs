@@ -75,21 +75,6 @@ namespace Biokudi_Backend.UI.Controllers
         }
 
         /// <summary>
-        /// Obtiene el informe de personas.
-        /// </summary>
-        [HttpGet("Person")]
-        [ProducesResponseType(typeof(AuditReportDto), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetPersonReport()
-        {
-            var result = await _auditService.GetAuditsReport("person");
-            if (result.IsFailure)
-                return BadRequest(result.ErrorMessage);
-            if (result.Value == null)
-                return NotFound();
-            return Ok(result.Value);
-        }
-
-        /// <summary>
         /// Obtiene el informe de imágenes.
         /// </summary>
         [HttpGet("Picture")]
